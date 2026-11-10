@@ -727,6 +727,7 @@ function render(){
   $("fruit").textContent = st ? st.fruit : "";
   $("fruit").hidden = !st;
   const rl = REFLECTS[day], rf = (st && rl) ? rl[m % rl.length] : "";
+  reflectBase = rf;
   $("reflectText").textContent = rf;
   $("reflect").hidden = !rf;
   $("card").hidden = true;
@@ -774,11 +775,14 @@ function render(){
   loadNote();
 }
 
+let reflectBase = "";
 function applyMode(){
   const mode = currentMode(), md = MODES[mode];
   document.body.classList.toggle("night", mode === "night");
   $("greet").textContent = md.greet;
   $("storyLabel").textContent = md.story;
+  // 晚安時段，默想前面加上「親愛的，」
+  if (reflectBase) $("reflectText").textContent = (mode === "night" ? "親愛的，" : "") + reflectBase;
 }
 // 時段跨過去（例如 10:59 → 11:00）時自動切換問候與配色
 setInterval(applyMode, 60000);
