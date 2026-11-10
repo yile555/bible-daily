@@ -803,7 +803,7 @@ function render(){
   const verses = TEXT[day];
   if (verses){
     $("verLine").hidden = false;
-    $("vlist").innerHTML = verses.map((v,i)=>`<li data-v="${i+1}"><span class="n">${i+1}</span><span class="vt${hlClass(day,i+1)}">${esc(v)}</span></li>`).join("");
+    $("vlist").innerHTML = verses.map((v,i)=>`<li data-v="${i+1}"><span class="n">${i+1}</span><span class="vt${hlClass(day,i+1)}">${esc(v).replace(/；(?!$)/g,"；<br>")}</span></li>`).join("");
   } else {
     $("verLine").hidden = true;
     $("vlist").innerHTML = `<li class="active"><span class="n"></span><span class="vt">這一章的經文還沒放進來，可以先按下面的「參考其他版本」到網路上讀。</span></li>`;
