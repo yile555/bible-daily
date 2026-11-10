@@ -133,19 +133,18 @@ details p{font-size:14px;color:var(--muted);margin:0 0 12px}
 .shead h1{margin:0}
 .shead .ver{margin:0}
 .shead .prog{margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-.frame{position:relative;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y mandatory;
+.fwrap{position:relative}
+.band{position:absolute;left:12px;right:12px;border-radius:8px;background:rgba(47,107,98,.11);border-left:3px solid var(--gold);pointer-events:none;z-index:0}
+body.night .band{background:rgba(127,192,179,.15)}
+.frame{position:relative;z-index:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
   -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14%,#000 82%,transparent 100%);
           mask-image:linear-gradient(to bottom,transparent 0,#000 14%,#000 82%,transparent 100%);
   scrollbar-width:none}
 .frame::-webkit-scrollbar{display:none}
 .vlist{list-style:none;margin:0;padding:0 22px}
-.vlist li{scroll-snap-align:start;padding:10px 0;font-family:var(--font-display);font-size:19px;line-height:1.85;
-  color:var(--muted);opacity:.55;transition:opacity .25s,color .25s;cursor:pointer;position:relative;padding-left:1.9em;-webkit-tap-highlight-color:transparent}
-.vlist li .n{position:absolute;left:0;top:calc(10px + .55em);font-family:var(--font-body);font-size:12px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
-.vlist li.read{opacity:.35}
-.vlist li.active{opacity:1;color:var(--ink)}
-.vlist li.active .n{color:var(--accent)}
-.vlist li.active .vt{font-weight:700}
+.vlist li{padding:6px 0;font-family:var(--font-display);font-size:19px;line-height:1.85;
+  color:var(--ink);cursor:pointer;position:relative;padding-left:1.9em;-webkit-tap-highlight-color:transparent}
+.vlist li .n{position:absolute;left:0;top:calc(6px + .55em);font-family:var(--font-body);font-size:12px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
 .vlist li.picked .vt{outline:2px dashed var(--gold);outline-offset:3px;border-radius:2px}
 .vt{-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .vt.hl-y{background:linear-gradient(transparent 52%,rgba(245,214,90,.6) 52%)}
@@ -156,8 +155,7 @@ body.night .vt.hl-y{background:linear-gradient(transparent 52%,rgba(245,214,90,.
 body.night .vt.hl-g{background:linear-gradient(transparent 52%,rgba(130,214,150,.32) 52%)}
 body.night .vt.hl-b{background:linear-gradient(transparent 52%,rgba(120,200,240,.32) 52%)}
 body.night .vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,.32) 52%)}
-.endbox{scroll-snap-align:start;padding:16px 22px 8px;display:flex;flex-direction:column;gap:12px;opacity:.5;transition:opacity .25s}
-.endbox.active{opacity:1}
+.endbox{padding:16px 22px 8px;display:flex;flex-direction:column;gap:12px}
 .endbox .done{font-size:13px;color:var(--muted);text-align:center;letter-spacing:.2em}
 .endbox .tcv{margin:0 auto}
 .hint{margin:-8px 0 0;text-align:center;font-size:12px;color:var(--muted);transition:opacity .4s}
@@ -198,6 +196,7 @@ body.night .vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,
   <section class="page" id="p1">
     <div class="scripture" aria-labelledby="chTitle">
       <div class="shead"><h1 id="chTitle"></h1><span class="ver" id="verLine">和合本</span><span class="prog" id="prog"></span></div>
+      <div class="fwrap"><div class="band" id="band"></div>
       <div class="frame" id="frame">
         <ol class="vlist" id="vlist"></ol>
         <div class="endbox" id="endbox">
@@ -205,7 +204,7 @@ body.night .vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,
           <button class="reveal" id="toStory">心情故事 ›</button>
           <a class="tcv" id="tcvLink" href="#" target="_blank" rel="noopener">參考其他版本 ›</a>
         </div>
-      </div>
+      </div></div>
     </div>
     <p class="hint" id="hint">往上滑，讀下一節</p>
   </section>
@@ -907,16 +906,20 @@ function layoutFrame(keep){
   // 確保整頁不會超出螢幕（不讓整個畫面捲動）
   const over = document.documentElement.scrollHeight - window.innerHeight;
   if (over > 0 && h - over >= 260){ h -= over; frame.style.height = h + "px"; }
-  padTop = Math.round(h * 0.18);
+  padTop = Math.round(h * 0.2);
+  const first = $("vlist").firstElementChild;
+  const lh = first ? parseFloat(getComputedStyle(first).lineHeight) : 35;
+  const band = $("band");
+  band.style.top = (padTop + 6 - 2) + "px";
+  band.style.height = (lh + 4) + "px";
   frame.style.paddingTop = padTop + "px";
-  frame.style.scrollPaddingTop = padTop + "px";
   frame.style.paddingBottom = Math.max(0, h - padTop - $("endbox").offsetHeight) + "px";
   if (!keep) frame.scrollTop = 0;
   markActive();
 }
 function markActive(){
   const items = [...$("vlist").children, $("endbox")];
-  const line = frame.scrollTop + padTop + 6;
+  const line = frame.scrollTop + padTop + 6 + 12;
   let idx = 0;
   items.forEach((el,i) => { if (el.offsetTop <= line) idx = i; });
   items.forEach((el,i) => {
