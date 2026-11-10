@@ -200,7 +200,6 @@ body.night .vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,
       <div class="frame" id="frame">
         <ol class="vlist" id="vlist"></ol>
         <div class="endbox" id="endbox">
-          <div class="done">讀完了</div>
           <button class="reveal" id="toStory">心情故事 ›</button>
           <a class="tcv" id="tcvLink" href="#" target="_blank" rel="noopener">參考其他版本 ›</a>
         </div>
@@ -927,7 +926,7 @@ function markActive(){
     el.classList.toggle("read", i < idx);
   });
   const total = items.length - 1;
-  $("prog").textContent = TEXT[cur.getDate()] ? (idx >= total ? "讀完了" : `${idx+1} / ${total}`) : "";
+  $("prog").textContent = TEXT[cur.getDate()] ? `${Math.min(idx+1,total)} / ${total}` : "";
   if (idx > 0 && !hintDone){ hintDone = true; $("hint").classList.add("gone"); }
 }
 let ticking = false;
