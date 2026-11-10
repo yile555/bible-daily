@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>箴言書的讀經日常</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* 晨光讀經：灰綠底、紙白頁、深墨字、松綠主色、一條金線。由上往下：經文 → 按鈕 → 格言卡 → 心得 */
+  --bg:#e7ece6;
+  --paper:#fbfaf5;
+  --ink:#1f2a2b;
+  --muted:#66706c;
+  --accent:#2f6b62;
+  --gold:#b48a35;
+  --line:#d3d9d2;
+  --font-display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --font-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.6}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:18px}
+button{font-family:inherit}
+button:focus-visible,a:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.greet{text-align:center;font-family:var(--font-display);font-size:15px;letter-spacing:.3em;color:var(--accent);margin-bottom:-6px}
+.prayer{background:transparent;border:1px dashed var(--gold);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.prayer[hidden]{display:none}
+.prayer .ptitle{font-size:13px;color:var(--muted);letter-spacing:.1em}
+.prayer p{font-family:var(--font-display);font-size:17px;line-height:1.9;margin:0}
+.prayer .bless{font-size:14px;color:var(--accent);font-weight:500;padding-top:6px;border-top:1px solid var(--line)}
+@media (prefers-reduced-motion:no-preference){ .prayer.show{animation:rise .6s ease-out} }
+body.night{
+  --bg:#141b1c; --paper:#1d2627; --ink:#e6ebe7; --muted:#9aa6a1; --accent:#7fc0b3; --gold:#c9a55a; --line:#2f3a3b;
+  color-scheme:dark;
+}
+body.night .reveal{color:#10201d}
+body.night .reveal.second{color:var(--accent)}
+body.night .dot.past{background:#24302f}
+body.night .dot.sel{color:#10201d}
+body.night .fruit{color:#10201d}
+.datebar{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.datebar .nav{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--paper);color:var(--accent);font-size:20px;cursor:pointer}
+.date{text-align:center}
+.date .d{font-size:18px;font-weight:700}
+.today{border:none;background:none;color:var(--accent);font-size:13px;cursor:pointer;padding:2px 6px;text-decoration:underline}
+.today[hidden]{display:none}
+
+.scripture{background:var(--paper);border-radius:14px;padding:26px 22px 22px;border:1px solid var(--line)}
+.scripture h1{font-family:var(--font-display);font-size:24px;margin:0 0 4px;color:var(--accent);letter-spacing:.08em}
+.scripture .ver{font-size:12px;color:var(--muted);margin:0 0 16px}
+.verses{font-family:var(--font-display);font-size:18px;line-height:2;margin:0}
+.verses sup{font-family:var(--font-body);font-size:11px;color:var(--gold);font-weight:700;margin-right:3px;vertical-align:super;font-variant-numeric:tabular-nums}
+.tcv{display:block;width:max-content;margin:14px 0 0 auto;color:var(--muted);text-decoration:none;font-size:13px;padding:6px 12px;border:1px solid var(--line);border-radius:999px}
+.tcv:hover{color:var(--accent);border-color:var(--accent)}
+.missing{color:var(--muted);font-size:15px;margin:0}
+.missing a{color:var(--accent)}
+
+.reveal{border:none;border-radius:12px;background:var(--accent);color:#fff;font-size:17px;font-weight:700;padding:16px;cursor:pointer}
+.reveal[hidden]{display:none}
+
+.story{background:var(--paper);border-radius:14px;padding:24px 22px 20px;border:1px solid var(--line);display:flex;flex-direction:column;gap:14px}
+.story[hidden]{display:none}
+.story .tag{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.story .fruit{background:var(--accent);color:#fff;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700}
+.story p{font-family:var(--font-display);font-size:18px;line-height:1.95;margin:0}
+.story .reflect{border-top:1px dashed var(--gold);padding-top:12px;display:flex;flex-direction:column;gap:4px}
+.story .reflect[hidden]{display:none}
+.story .reflect .rt{font-size:12px;color:var(--gold);letter-spacing:.25em;font-weight:700}
+.story .reflect p{font-family:var(--font-body);font-size:15px;line-height:1.85;color:var(--muted);margin:0}
+.reveal.second{background:var(--paper);color:var(--accent);border:2px solid var(--accent)}
+@media (prefers-reduced-motion:no-preference){ .story.show{animation:rise .5s ease-out} }
+.card{background:var(--paper);border-radius:14px;padding:32px 26px 22px;box-shadow:0 1px 2px rgba(31,42,43,.06),0 8px 24px rgba(31,42,43,.10);position:relative;display:flex;flex-direction:column;gap:20px}
+.card[hidden]{display:none}
+.card::before{content:"";position:absolute;left:26px;right:26px;top:14px;height:2px;background:var(--gold);opacity:.7;border-radius:2px}
+.chap{font-family:var(--font-display);color:var(--accent);font-size:14px;letter-spacing:.2em;font-weight:700}
+.maxim{font-family:var(--font-display);font-size:27px;line-height:1.65;font-weight:500;text-wrap:balance;margin:0}
+.maxim .seg{display:inline-block}
+.maxim.empty{font-size:18px;color:var(--muted)}
+.foot{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:10px}
+@media (prefers-reduced-motion:no-preference){
+  .card.show{animation:rise .5s ease-out}
+  @keyframes rise{from{opacity:.2;transform:translateY(12px)}to{opacity:1;transform:none}}
+}
+
+.notes{display:flex;flex-direction:column;gap:8px}
+.notes label{font-weight:700;font-size:15px}
+.notes textarea{width:100%;min-height:130px;resize:vertical;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.7;padding:12px}
+.notes .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.notes .status{font-size:13px;color:var(--muted)}
+.save{border:1px solid var(--accent);background:var(--paper);color:var(--accent);font-weight:700;border-radius:10px;padding:9px 18px;cursor:pointer;font-size:15px}
+.save:disabled{opacity:.45;cursor:default}
+
+details{background:var(--paper);border-radius:10px;padding:4px 16px;border:1px solid var(--line)}
+summary{cursor:pointer;padding:10px 0;font-size:14px;font-weight:500;color:var(--muted)}
+.dots{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px}
+.dot{aspect-ratio:1;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer;position:relative;padding:0}
+.dot.has::after{content:"";position:absolute;bottom:4px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--gold)}
+.dot.past{background:#dde6df;color:var(--muted)}
+.dot.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+.dot.sel.has::after{background:#fff}
+.dot:disabled{opacity:.3;cursor:default}
+.list{margin:0 0 12px;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.list li{display:grid;grid-template-columns:3.4em 1fr;gap:8px;font-size:15px}
+.list li span{color:var(--muted);font-size:12px;padding-top:3px;font-variant-numeric:tabular-nums}
+.list li.now{color:var(--accent);font-weight:700}
+.journal{margin:0 0 12px;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+.journal li{border-left:2px solid var(--gold);padding-left:10px}
+.journal .h{font-size:12px;color:var(--muted)}
+.journal .t{font-size:15px;white-space:pre-wrap}
+.journal button{border:none;background:none;color:var(--accent);padding:0;font-size:12px;cursor:pointer;text-decoration:underline}
+details p{font-size:14px;color:var(--muted);margin:0 0 12px}
+
+/* ── 分頁 ── */
+.page[hidden]{display:none}
+.page{display:flex;flex-direction:column;gap:18px}
+@media (prefers-reduced-motion:no-preference){
+  .page.in-next{animation:pin .35s ease-out}
+  .page.in-back{animation:pback .35s ease-out}
+  @keyframes pin{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+  @keyframes pback{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
+}
+.back{align-self:flex-start;border:none;background:none;color:var(--accent);font-size:14px;padding:4px 2px;cursor:pointer}
+
+/* ── 經文框：一節一行，正在讀的那節變色 ── */
+.scripture{padding:20px 0 0;display:flex;flex-direction:column;overflow:hidden}
+.shead{display:flex;align-items:baseline;gap:10px;padding:0 22px 8px;border-bottom:1px solid var(--line)}
+.shead h1{margin:0}
+.shead .ver{margin:0}
+.shead .prog{margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.frame{position:relative;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y mandatory;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14%,#000 82%,transparent 100%);
+          mask-image:linear-gradient(to bottom,transparent 0,#000 14%,#000 82%,transparent 100%);
+  scrollbar-width:none}
+.frame::-webkit-scrollbar{display:none}
+.vlist{list-style:none;margin:0;padding:0 22px}
+.vlist li{scroll-snap-align:start;padding:10px 0;font-family:var(--font-display);font-size:19px;line-height:1.85;
+  color:var(--muted);opacity:.55;transition:opacity .25s,color .25s;cursor:pointer;display:grid;grid-template-columns:1.9em 1fr;-webkit-tap-highlight-color:transparent}
+.vlist li .n{font-family:var(--font-body);font-size:12px;font-weight:700;color:var(--gold);padding-top:.55em;font-variant-numeric:tabular-nums}
+.vlist li.read{opacity:.35}
+.vlist li.active{opacity:1;color:var(--ink)}
+.vlist li.active .n{color:var(--accent)}
+.vlist li.active .vt{font-weight:700}
+.vlist li.picked .vt{outline:2px dashed var(--gold);outline-offset:3px;border-radius:2px}
+.vt{-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.vt.hl-y{background:linear-gradient(transparent 52%,rgba(245,214,90,.6) 52%)}
+.vt.hl-g{background:linear-gradient(transparent 52%,rgba(130,214,150,.55) 52%)}
+.vt.hl-b{background:linear-gradient(transparent 52%,rgba(120,200,240,.55) 52%)}
+.vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,.55) 52%)}
+body.night .vt.hl-y{background:linear-gradient(transparent 52%,rgba(245,214,90,.35) 52%)}
+body.night .vt.hl-g{background:linear-gradient(transparent 52%,rgba(130,214,150,.32) 52%)}
+body.night .vt.hl-b{background:linear-gradient(transparent 52%,rgba(120,200,240,.32) 52%)}
+body.night .vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,.32) 52%)}
+.endbox{scroll-snap-align:start;padding:16px 22px 8px;display:flex;flex-direction:column;gap:12px;opacity:.5;transition:opacity .25s}
+.endbox.active{opacity:1}
+.endbox .done{font-size:13px;color:var(--muted);text-align:center;letter-spacing:.2em}
+.endbox .tcv{margin:0 auto}
+.hint{margin:-8px 0 0;text-align:center;font-size:12px;color:var(--muted);transition:opacity .4s}
+.hint.gone{opacity:0}
+
+/* ── 點經文跳出的選單 ── */
+.sheet{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.25)}
+.sheet[hidden]{display:none}
+.sbox{width:100%;max-width:560px;background:var(--paper);color:var(--ink);border-radius:18px 18px 0 0;padding:16px 20px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;box-shadow:0 -6px 24px rgba(0,0,0,.15)}
+@media (prefers-reduced-motion:no-preference){ .sheet:not([hidden]) .sbox{animation:up .22s ease-out} @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}} }
+.srow{display:flex;align-items:center;justify-content:space-between}
+.srow b{font-size:15px}
+.sx{width:36px;height:36px;border-radius:50%;border:none;background:var(--bg);color:var(--ink);font-size:16px;cursor:pointer}
+.stext{margin:0;font-family:var(--font-display);font-size:16px;line-height:1.8;color:var(--muted)}
+.colors{display:flex;gap:12px;align-items:center}
+.cdot{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer}
+.cdot.on{border-color:var(--ink)}
+.cdot.y{background:#f5d65a}.cdot.g{background:#82d696}.cdot.b{background:#78c8f0}.cdot.p{background:#f2a0c3}
+.cdot.x{background:var(--bg);color:var(--muted);font-size:12px;width:auto;padding:0 12px;border-radius:999px;border-color:var(--line)}
+.sact{display:block;width:100%;text-align:left;border:none;border-top:1px solid var(--line);background:none;color:var(--ink);font-size:16px;padding:13px 2px;cursor:pointer;text-decoration:none;font-family:inherit}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:14px;padding:9px 16px;border-radius:999px;z-index:30;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="greet" id="greet"></div>
+  <div class="datebar">
+    <button class="nav" id="prev" aria-label="前一天">‹</button>
+    <div class="date">
+      <div class="d" id="dateText"></div>
+      <button class="today" id="today" hidden>回到今天</button>
+    </div>
+    <button class="nav" id="next" aria-label="後一天">›</button>
+  </div>
+
+  <section class="page" id="p1">
+    <div class="scripture" aria-labelledby="chTitle">
+      <div class="shead"><h1 id="chTitle"></h1><span class="ver" id="verLine">和合本</span><span class="prog" id="prog"></span></div>
+      <div class="frame" id="frame">
+        <ol class="vlist" id="vlist"></ol>
+        <div class="endbox" id="endbox">
+          <div class="done">讀完了</div>
+          <button class="reveal" id="toStory">心情故事 ›</button>
+          <a class="tcv" id="tcvLink" href="#" target="_blank" rel="noopener">參考其他版本 ›</a>
+        </div>
+      </div>
+    </div>
+    <p class="hint" id="hint">往上滑，讀下一節</p>
+  </section>
+
+  <section class="page" id="p2" hidden>
+    <button class="back" data-go="1">‹ 回到經文</button>
+    <article class="story" id="story">
+      <div class="tag"><span id="storyLabel">今日心情故事</span><span class="fruit" id="fruit"></span></div>
+      <p id="storyText"></p>
+      <div class="reflect" id="reflect" hidden><span class="rt">默想</span><p id="reflectText"></p></div>
+    </article>
+    <button class="reveal second" id="toMaxim">今日格言 ›</button>
+  </section>
+
+  <section class="page" id="p3" hidden>
+    <button class="back" data-go="2">‹ 回到心情故事</button>
+    <article class="card" id="card">
+      <div class="chap" id="chap"></div>
+      <p class="maxim" id="maxim"></p>
+      <div class="foot" id="monthTag"></div>
+    </article>
+
+    <article class="prayer" id="prayer">
+      <div class="ptitle">今日禱告</div>
+      <p id="prayerText"></p>
+      <div class="bless" id="bless"></div>
+    </article>
+
+  <section class="notes">
+    <label for="note">屬於你的心情故事</label>
+    <textarea id="note" placeholder="今天讀完，心裡有什麼想說的？開心或難過都可以寫在這裡。"></textarea>
+    <div class="row">
+      <span class="status" id="status"></span>
+      <button class="save" id="save" disabled>儲存</button>
+    </div>
+  </section>
+
+  <details>
+    <summary>我的心情故事紀錄</summary>
+    <ul class="journal" id="journal"></ul>
+  </details>
+
+  <details>
+    <summary id="planSum">本月讀經進度</summary>
+    <div class="dots" id="dots"></div>
+  </details>
+
+  <details id="allBox">
+    <summary id="allSum">這一章的 12 句格言</summary>
+    <ol class="list" id="allList"></ol>
+  </details>
+
+  <details>
+    <summary>怎麼用</summary>
+    <p>箴言有 31 章，幾號就讀第幾章，一個月讀完一輪。</p>
+    <p>經文一節一行，正在讀的那一節顏色比較深，往上滑就換下一節，不怕讀到一半找不到位置。讀到最後，按「心情故事」換到下一頁，再按「今日格言」，會一起出現今日禱告。同一章每個月會換一組，一年 12 組不重複。</p>
+    <p>點一下任何一節經文，可以用顏色標記、複製、對照其他版本，或直接寫進「屬於你的心情故事」。標記會留在這台裝置上，下個月讀到同一章還看得到。</p>
+    <p>故事最後的「默想」，是留給你的一個小問題。想到什麼，可以寫進下面的「屬於你的心情故事」，沒有標準答案，想不到也沒關係。</p>
+    <p>故事上方的兩個字，是聖靈的九種果子之一：仁愛、喜樂、和平、忍耐、恩慈、良善、信實、溫柔、節制。</p>
+    <p>「屬於你的心情故事」按「儲存」後，會存在你現在用的這支手機或這台電腦上，只有你自己看得到，在「我的心情故事紀錄」可以回顧。換一台裝置，或清除瀏覽器資料，之前的紀錄就看不到了。</p>
+    <p>經文最後的「參考其他版本」會打開 bible.com，先顯示現代中文譯本 2019 版，在那裡也能切換成其他譯本。讀完切回這裡繼續。</p>
+    <p>依打開的時間自動切換：早安 5:00～10:59、午安 11:00～17:59、晚安 18:00 以後（畫面變深色）。禱告的開頭和祝福會跟著時段變化。</p>
+    <p>進度表裡有金點的日期，代表那一章的格言已經寫好。</p>
+  </details>
+  </section>
+
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sbox" role="dialog" aria-labelledby="sRef">
+    <div class="srow"><b id="sRef"></b><button class="sx" id="sClose" aria-label="關閉">✕</button></div>
+    <p class="stext" id="sText"></p>
+    <div class="colors" id="colors">
+      <button class="cdot y" data-c="y" aria-label="黃色標記"></button>
+      <button class="cdot g" data-c="g" aria-label="綠色標記"></button>
+      <button class="cdot b" data-c="b" aria-label="藍色標記"></button>
+      <button class="cdot p" data-c="p" aria-label="粉色標記"></button>
+      <button class="cdot x" data-c="" aria-label="清除標記">清除</button>
+    </div>
+    <button class="sact" id="sCopy">複製這節經文</button>
+    <a class="sact" id="sCompare" href="#" target="_blank" rel="noopener">對照其他版本 ›</a>
+    <button class="sact" id="sNote">寫進我的心情故事</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// ── 經文（中文和合本，1919，已無版權）──
+const TEXT = {
+  11: [
+    "詭詐的天平為耶和華所憎惡；公平的法碼為他所喜悅。",
+    "驕傲來，羞恥也來；謙遜人卻有智慧。",
+    "正直人的純正必引導自己；奸詐人的乖僻必毀滅自己。",
+    "發怒的日子資財無益；惟有公義能救人脫離死亡。",
+    "完全人的義必指引他的路；但惡人必因自己的惡跌倒。",
+    "正直人的義必拯救自己；奸詐人必陷在自己的罪孽中。",
+    "惡人一死，他的指望必滅絕；罪人的盼望也必滅沒。",
+    "義人得脫離患難，有惡人來代替他。",
+    "不虔敬的人用口敗壞鄰舍；義人卻因知識得救。",
+    "義人享福，合城喜樂；惡人滅亡，人都歡呼。",
+    "城因正直人祝福便高舉，卻因邪惡人的口就傾覆。",
+    "藐視鄰舍的，毫無智慧；明哲人卻靜默不言。",
+    "往來傳舌的，洩漏密事；心中誠實的，遮隱事情。",
+    "無智謀，民就敗落；謀士多，人便安居。",
+    "為外人作保的，必受虧損；恨惡擊掌的，卻得安穩。",
+    "恩德的婦女得尊榮；強暴的男子得資財。",
+    "仁慈的人善待自己；殘忍的人擾害己身。",
+    "惡人經營，得虛浮的工價；撒義種的，得實在的果效。",
+    "恆心為義的，必得生命；追求邪惡的，必致死亡。",
+    "心中乖僻的，為耶和華所憎惡；行事完全的，為他所喜悅。",
+    "惡人雖然連手，必不免受罰；義人的後裔必得拯救。",
+    "婦女美貌而無見識，如同金環帶在豬鼻上。",
+    "義人的心願盡得好處；惡人的指望致干忿怒。",
+    "有施散的，卻更增添；有吝惜過度的，反致窮乏。",
+    "好施捨的，必得豐裕；滋潤人的，必得滋潤。",
+    "屯糧不賣的，民必咒詛他；情願出賣的，人必為他祝福。",
+    "懇切求善的，就求得恩惠；惟獨求惡的，惡必臨到他身。",
+    "倚仗自己財物的，必跌倒；義人必發旺，如青葉。",
+    "擾害己家的，必承受清風；愚昧人必作慧心人的僕人。",
+    "義人所結的果子就是生命樹；有智慧的，必能得人。",
+    "看哪，義人在世尚且受報，何況惡人和罪人呢？"
+  ],
+  10: [
+    "所羅門的箴言：智慧之子使父親歡樂；愚昧之子叫母親擔憂。",
+    "不義之財毫無益處；惟有公義能救人脫離死亡。",
+    "耶和華不使義人受飢餓；惡人所欲的，他必推開。",
+    "手懶的，要受貧窮；手勤的，卻要富足。",
+    "夏天聚斂的，是智慧之子；收割時沉睡的，是貽羞之子。",
+    "福祉臨到義人的頭；強暴蒙蔽惡人的口。",
+    "義人的紀念被稱讚；惡人的名字必朽爛。",
+    "心中智慧的，必受命令；口裡愚妄的，必致傾倒。",
+    "行正直路的，步步安穩；走彎曲道的，必致敗露。",
+    "以眼傳神的，使人憂患；口裡愚妄的，必致傾倒。",
+    "義人的口是生命的泉源；強暴蒙蔽惡人的口。",
+    "恨能挑啟爭端；愛能遮掩一切過錯。",
+    "明哲人嘴裡有智慧；無知人背上受刑杖。",
+    "智慧人積存知識；愚妄人的口速致敗壞。",
+    "富戶的財物是他的堅城；窮人的貧乏是他的敗壞。",
+    "義人的勤勞致生；惡人的進項致死（「死」原文作「罪」）。",
+    "謹守訓誨的，乃在生命的道上；違棄責備的，便失迷了路。",
+    "隱藏怨恨的，有說謊的嘴；口出讒謗的，是愚妄的人。",
+    "多言多語難免有過；禁止嘴唇是有智慧。",
+    "義人的舌乃似高銀；惡人的心所值無幾。",
+    "義人的口教養多人；愚昧人因無知而死亡。",
+    "耶和華所賜的福使人富足，並不加上憂慮。",
+    "愚妄人以行惡為戲耍；明哲人卻以智慧為樂。",
+    "惡人所怕的，必臨到他；義人所願的，必蒙應允。",
+    "暴風一過，惡人歸於無有；義人的根基卻是永久。",
+    "懶惰人叫差他的人如醋倒牙，如煙薰目。",
+    "敬畏耶和華使人日子加多；但惡人的年歲必被減少。",
+    "義人的盼望必得喜樂；惡人的指望必致滅沒。",
+    "耶和華的道是正直人的保障，卻成了作孽人的敗壞。",
+    "義人永不挪移；惡人不得住在地上。",
+    "義人的口滋生智慧；乖謬的舌必被割斷。",
+    "義人的嘴能令人喜悅；惡人的口說乖謬的話。"
+  ],
+  9: [
+    "智慧建造房屋，鑿成七根柱子，",
+    "宰殺牲畜，調和旨酒，設擺筵席；",
+    "打發使女出去，自己在城中至高處呼叫，",
+    "說：誰是愚蒙人，可以轉到這裡來！又對那無知的人說：",
+    "你們來，吃我的餅，喝我調和的酒。",
+    "你們愚蒙人，要捨棄愚蒙，就得存活，並要走光明的道。",
+    "指斥褻慢人的，必受辱罵；責備惡人的，必被玷污。",
+    "不要責備褻慢人，恐怕他恨你；要責備智慧人，他必愛你。",
+    "教導智慧人，他就越發有智慧；指示義人，他就增長學問。",
+    "敬畏耶和華是智慧的開端；認識至聖者便是聰明。",
+    "你藉著我，日子必增多，年歲也必加添。",
+    "你若有智慧，是與自己有益；你若褻慢，就必獨自擔當。",
+    "愚昧的婦人喧嚷；他是愚蒙，一無所知。",
+    "他坐在自己的家門口，坐在城中高處的座位上，",
+    "呼叫過路的，就是直行其道的人，",
+    "說：誰是愚蒙人，可以轉到這裡來！又對那無知的人說：",
+    "偷來的水是甜的，暗吃的餅是好的。",
+    "卻不知有陰魂在他那裡；他的客在陰間的深處。"
+  ],
+  8: [
+    "智慧豈不呼叫？聰明豈不發聲？",
+    "他在道旁高處的頂上，在十字路口站立，",
+    "在城門旁，在城門口，在城門洞，大聲說：",
+    "眾人哪，我呼叫你們，我向世人發聲。",
+    "說：愚蒙人哪，你們要會悟靈明；愚昧人哪，你們當心裡明白。",
+    "你們當聽，因我要說極美的話；我張嘴要論正直的事。",
+    "我的口要發出真理；我的嘴憎惡邪惡。",
+    "我口中的言語都是公義，並無彎曲乖僻。",
+    "有聰明的，以為明顯，得知識的，以為正直。",
+    "你們當受我的教訓，不受白銀；寧得知識，勝過黃金。",
+    "因為智慧比珍珠（或譯：紅寶石）更美；一切可喜愛的都不足與比較。",
+    "我─智慧以靈明為居所，又尋得知識和謀略。",
+    "敬畏耶和華在乎恨惡邪惡；那驕傲、狂妄，並惡道，以及乖謬的口，都為我所恨惡。",
+    "我有謀略和真知識；我乃聰明，我有能力。",
+    "帝王藉我坐國位；君王藉我定公平。",
+    "王子和首領，世上一切的審判官，都是藉我掌權。",
+    "愛我的，我也愛他；懇切尋求我的，必尋得見。",
+    "豐富尊榮在我；恆久的財並公義也在我。",
+    "我的果實勝過黃金，強如精金；我的出產超乎高銀。",
+    "我在公義的道上走，在公平的路中行，",
+    "使愛我的，承受貨財，並充滿他們的府庫。",
+    "在耶和華造化的起頭，在太初創造萬物之先，就有了我。",
+    "從亙古，從太初，未有世界以前，我已被立。",
+    "沒有深淵，沒有大水的泉源，我已生出。",
+    "大山未曾奠定，小山未有之先，我已生出。",
+    "耶和華還沒有創造大地和田野，並世上的土質，我已生出。",
+    "他立高天，我在那裡；他在淵面的周圍，劃出圓圈，",
+    "上使穹蒼堅硬，下使淵源穩固，",
+    "為滄海定出界限，使水不越過他的命令，立定大地的根基。",
+    "那時，我在他那裡為工師，日日為他所喜愛，常常在他面前踴躍，",
+    "踴躍在他為人預備可住之地，也喜悅住在世人之間。",
+    "眾子啊，現在要聽從我，因為謹守我道的，便為有福。",
+    "要聽教訓，就得智慧，不可棄絕。",
+    "聽從我，日日在我門口仰望，在我門框旁邊等候的，那人便為有福。",
+    "因為尋得我的，就尋得生命，也必蒙耶和華的恩惠。",
+    "得罪我的，卻害了自己的性命；恨惡我的，都喜愛死亡。"
+  ]
+};
+// ── 格言：每章 12 句，依序對應 1～12 月 ──
+const MAXIMS = {
+  "11": [
+    "秤得公道，心裡也跟著踏實。",
+    "肯說「我不會」的人，學得最快。",
+    "心裡正直，就是最準的指南針。",
+    "一個人的善意，能讓一整條街變暖。",
+    "別人交給你的心事，要輕輕收好。",
+    "多聽幾個人的意見，路會走得更穩。",
+    "善待別人，自己的心也先暖了。",
+    "今天撒下的好種子，總有一天會結果。",
+    "手張開的人，接到的反而更多。",
+    "替別人澆水的人，自己的心也不會乾。",
+    "活出好樣子，就像種一棵給人乘涼的樹。",
+    "一心找好事做的人，好事也會找到他。"
+  ],
+  "10": [
+    "趁陽光正好，把溫暖收起來，留給下雨天。",
+    "活得踏實的人，身邊的人也跟著安心。",
+    "話少一點，心裡的分寸就多一點。",
+    "一句好話，能讓乾渴的心喝飽。",
+    "說出口的溫暖，比銀子還值錢。",
+    "肯接受提醒的人，路越走越清楚。",
+    "勤快的手，會把日子一點一點填滿。",
+    "風雨過後，根扎得深的還站著。",
+    "好人走過的路，會留下讓人想念的香氣。",
+    "真正的祝福，不會讓你多添煩憂。",
+    "愛會把別人的缺口，輕輕蓋起來。",
+    "心裡有盼望，等待的日子也有光。"
+  ],
+  "9": [
+    "把根基打穩，房子才住得久。",
+    "好東西都備好了，只等你走進來。",
+    "換一條明亮的路，日子也跟著亮。",
+    "肯聽勸的人，朋友會越來越多。",
+    "肯學的人，一點就能長出一片。",
+    "懂得敬重，是聰明的第一步。",
+    "用心過的日子，每一天都算數。",
+    "學到的智慧，最先受益的是自己。",
+    "最大聲的地方，不一定有最好的路。",
+    "認定方向走的人，不容易被叫走。",
+    "光明正大得來的，吃起來最安心。",
+    "把好道理分給人，它會變得更多。"
+  ],
+  "8": [
+    "越早出發去找，越早遇見答案。",
+    "心放低一點，學到的就多一點。",
+    "想得清楚，走起來就有力。",
+    "說直話的嘴，比會說話的嘴可貴。",
+    "走正直的路，腳步會越來越穩。",
+    "學會一個好道理，勝過多一箱金子。",
+    "帶著歡喜做事，事情也會發亮。",
+    "留得最久的財富，是學到的東西。",
+    "天天守在門口的人，最先聽見好消息。",
+    "找到智慧的人，日子就有了方向。",
+    "好的道理不躲藏，就站在路口等你。",
+    "好的道理比山還老，卻天天都新鮮。"
+  ]
+};
+
+// ── 心情故事：每章 12 個，對應 1～12 月的格言，fruit 是聖靈的果子 ──
+const STORIES = {
+  "11": [
+    { "fruit": "信實", "text": "市場口的水果攤，阿土伯一擺就是三十年。他的秤擦得亮晶晶的，每次秤完，都會把秤盤轉過去，讓客人看清楚。隔壁攤的年輕人曾經偷偷教他：「秤調一下，一天可以多賺好幾百。」阿土伯搖搖頭，笑著說：「多賺那幾百塊，晚上會睡不好。」這些年來，常有老客人特地繞路來買他的水果，後來還帶著自己的孩子一起來。阿土伯說：「秤是給客人看的，也是給我自己的心看的。」" },
+    { "fruit": "溫柔", "text": "阿倫剛升上組長的時候，很怕別人覺得他不夠格，遇到不懂的事，也硬撐著不敢問。結果好幾件工作都卡住了，他每天加班到很晚，心裡越來越累。有一天開會，他深吸一口氣，對大家說：「這個新系統我其實不太會，可以請大家教我嗎？」會議室安靜了一下，接著，好幾個同事都笑著舉手說要幫忙。那個月，整組的進度反而追上來了。阿倫後來常說：「說出『我不會』的那一刻，我才真的開始學會。」" },
+    { "fruit": "良善", "text": "小蓉在家電行上班。有一天，一位阿嬤走進店裡，說要買最貴的那台洗衣機。小蓉多問了幾句，才知道阿嬤一個人住，每次只洗幾件衣服。她想了想，帶阿嬤走到旁邊，介紹一台小一點、操作也簡單的款式：「阿嬤，這台就很夠用了，按鈕也比較好認。」阿嬤開開心心地買回家。過了幾個月，阿嬤又來了，還帶著鄰居來買電鍋，指名要找小蓉。小蓉說，她其實沒想那麼多，只是照著心裡覺得對的方向走而已。" },
+    { "fruit": "仁愛", "text": "巷口那面空牆，原本總是堆滿雜物。退休的林阿姨看了很久，有一天，她釘了一個小木架，放上幾本自己看過的書，旁邊貼了一張紙：「喜歡就帶回家，有好書也歡迎放進來。」一開始沒什麼人注意。慢慢地，有人放了繪本，有人放了食譜，還有放學的孩子蹲在架子前看得入神。後來，鄰居們乾脆一起把牆刷成淡黃色，還擺了兩張小椅子，大家見面都會多聊幾句。林阿姨說：「我只是放了幾本書，是大家一起讓這條巷子變暖的。」" },
+    { "fruit": "節制", "text": "佳慧在辦公室裡很好相處，大家都喜歡找她聊天。有一次，好朋友小芳私下告訴她，自己最近遇到一些難處，心裡很亂。過了幾天，有同事好奇地來打聽：「小芳最近怎麼了？妳應該知道吧？」佳慧笑了笑，把話題輕輕轉開：「她最近比較忙，我們買點好吃的給她吧。」那天下午，小芳桌上多了一杯熱可可。後來小芳跟她說：「謝謝妳，把我的心事收得這麼好。」佳慧說：「妳願意說給我聽，我就要好好替妳收著。」" },
+    { "fruit": "和平", "text": "阿德第一次接下社區健走隊的領隊，心裡很緊張，怕路線太遠，長輩們走不動。他沒有一個人悶著想，而是先去問走了十幾年的老隊員，哪條路比較平；又請社區的護理師提醒他要注意什麼，連里長都幫他找好了中途休息的涼亭。每個人給一點意見，路線就這樣慢慢排好了。出發那天，大家一路說說笑笑，最後全部平平安安地走回來。阿德說：「一個人想，越想越慌；大家一起想，心就安了。」" },
+    { "fruit": "恩慈", "text": "阿哲每天搭公車上班，總是戴著耳機、低頭滑手機，覺得通勤是一天裡最累的時候。有一天，他看到前面的阿伯下車時，對司機大哥說了一聲：「辛苦了，謝謝！」司機大哥愣了一下，接著露出大大的笑容。隔天，阿哲也試著在下車時說聲謝謝。說完，他發現自己的嘴角也跟著揚了起來。慢慢地，他開始會讓座給提著菜的阿姨，也會幫推嬰兒車的媽媽扶一下車門。他說：「同一條路、同一班車，心情卻完全不一樣了。」" },
+    { "fruit": "忍耐", "text": "阿弘在山上的小學當了好多年的棒球教練。球隊人少，比賽很少贏，但他每天放學後還是陪孩子們練傳接球，練完再一起吃便當。有人問他：「這樣教，值得嗎？」阿弘只是笑笑：「種子撒下去，要等。」十五年後的一個下午，一個高高的年輕人走進球場，喊了一聲：「教練！」原來是當年球隊裡最瘦小的孩子，現在回到家鄉，也當起了教練。兩個人站在球場邊，看著一群孩子在夕陽下奔跑，很久都沒有說話。" },
+    { "fruit": "仁愛", "text": "巷子裡的小麵包店，每天晚上打烊前，老闆娘都會把當天沒賣完的麵包裝好，分給收垃圾的清潔隊員和晚下課的學生。有人替她算過，一個月下來少賺了不少。她總是說：「麵包放到明天就不好吃了，給肚子餓的人剛剛好。」有一年颱風，店裡淹了水。隔天一早，清潔隊員帶著工具來了，當年拿過麵包的學生也來了，大家捲起袖子一起清。不到一天，小店就重新開門。老闆娘看著滿屋子的人說：「我給出去的只是麵包，收回來的卻是一整條巷子的心。」" },
+    { "fruit": "喜樂", "text": "秀琴退休以後，日子一下子空了下來，常常一個人在家，不知道要做什麼。後來，朋友邀她去安養中心當志工，每個星期三下午，陪長輩們聊天、讀報紙。她原本以為自己是去照顧別人的，沒想到，長輩們拉著她的手，說起年輕時的故事；有人教她唱老歌，有人送她自己摺的紙鶴。每次回家的路上，她的心都滿滿的。她笑著說：「我本來是去替他們澆水的，沒想到，被滋潤的是我自己。」" },
+    { "fruit": "信實", "text": "三十年前，社區的公園還是一片空地。住在附近的陳阿公買了一棵小小的樟樹苗，種在空地的角落。那時候鄰居們都笑他：「這麼小一棵，要等到什麼時候才有樹蔭啊？」阿公不說什麼，每天早上提著水桶去澆水，颱風來之前，還會幫小樹綁上支架。現在，那棵樟樹已經長得又高又壯，夏天的傍晚，總有人在樹下乘涼、下棋、聊天。阿公坐在樹下的椅子上，搖著扇子說：「我種的不只是樹，是大家可以坐下來的地方。」" },
+    { "fruit": "恩慈", "text": "每天早上七點，退休的周伯伯都會穿上黃色背心，站在小學門口的路口，舉著小旗子帶孩子們過馬路。不管颳風下雨，他都笑著跟每個孩子說早安。有一年冬天，周伯伯感冒了，好幾天沒有出現。那個星期五，一群孩子拿著一張大卡片來到他家門口，上面畫滿了黃色背心和小旗子，還有家長送來一鍋熱熱的雞湯。周伯伯捧著那鍋湯，眼眶熱熱的。他說：「我每天只是想做一點好事，沒想到，好事全都回來找我了。」" }
+  ],
+  "8": [
+    {
+      "fruit": "仁愛",
+      "text": "小芸從小就愛吃阿嬤煎的菜脯蛋，每次都說「等我有空再跟阿嬤學」，這句話一說就是好多年。有一天她突然想，不能再等了。那個週六，她一早就跟著阿嬤去市場，看阿嬤怎麼挑菜脯；回到家，又站在爐子旁，聽阿嬤一邊煎一邊講火候。前幾次她把蛋煎焦了一面，阿嬤只是笑著說：「沒關係，我第一次也是這樣。」連著練了幾個週末，她終於煎出邊邊金黃的菜脯蛋。阿嬤夾起一口，慢慢嚼著，點點頭說：「這個味道，以後就交給妳了。」那一刻，小芸好慶幸自己早一點出發了。"
+    },
+    {
+      "fruit": "溫柔",
+      "text": "阿哲在修車行做了二十年，車子哪裡不對勁，他聽引擎聲就知道。今年店裡來了一個大學生當學徒，常常拿著手機查新車的電腦系統。有一天，一台新車怎麼修都找不出問題，阿哲忙得滿頭大汗。學徒在旁邊猶豫了很久，才小聲地說：「師傅，要不要接電腦看看？」阿哲愣了一下，接著把扳手放到一旁，拉了張椅子坐下來：「好啊，你教我。」那天下午，一老一少圍著電腦研究到傍晚。收工時，阿哲拍拍學徒的肩膀說：「肯問，人就不會老。謝謝你。」"
+    },
+    {
+      "fruit": "節制",
+      "text": "美玲一直想開一家早餐店，可是每次想到要花的錢、要早起、要顧孩子，心裡就七上八下。有天晚上，她乾脆拿出一張紙，把擔心的事一條一條寫下來：要準備多少錢、幾點要起床、家人可以怎麼幫忙。寫著寫著，那些亂成一團的念頭，好像慢慢排好了隊。那天晚上，她睡得特別好。開店以後雖然還是很忙，但她每天都知道下一步要做什麼。她笑著說：「心裡清楚了，腳步就有力氣了。」"
+    },
+    {
+      "fruit": "良善",
+      "text": "阿凱很會說話，下課時間總有一群同學圍著他聽笑話。這學期班上要選班代表，大家都起鬨推他。阿凱卻站起來說：「我覺得小安比較適合。我們交代他的事，他每一次都會做到。」教室安靜了幾秒，接著響起一陣掌聲，坐在角落的小安紅著臉低下頭。下課後，老師走到阿凱身邊，拍拍他的肩膀：「你今天說的這句話，比你講過的所有笑話都好聽。」"
+    },
+    {
+      "fruit": "信實",
+      "text": "雜貨店的陳伯，有天早上開店時，在門口撿到一個皮夾，裡面有不少現金。他把皮夾收進抽屜，在門口貼了一張紙：「有東西掉了嗎？請進來認領。」三天後，一個年輕人氣喘吁吁地跑進來，說那是他整個月的房租，找了好久都找不到。陳伯把皮夾還給他，還倒了一杯水讓他坐下來喘口氣。後來，這個年輕人成了店裡的老客人，常常帶朋友來買東西。陳伯笑著說：「做人實在，生意才站得住。」"
+    },
+    {
+      "fruit": "仁愛",
+      "text": "阿公八十歲生日那天，把一本泛黃的舊筆記本交給孫子小宇。裡面寫的是阿公一輩子的心得：「先聽完，再說話。」「借來的東西，早一天還。」「吃飯的時候，把手機收起來。」小宇那時候只覺得好笑，隨手收進抽屜。長大以後，他才慢慢發現，這幾句簡單的話，陪他交到真心的朋友、把工作做好，也少走了很多冤枉路。現在，那本筆記本放在他書桌最顯眼的地方。他說：「這是我拿到最值錢的禮物。」"
+    },
+    {
+      "fruit": "喜樂",
+      "text": "社區的清潔阿姨，每天一早就拿著掃把掃落葉，一邊掃一邊哼著歌。有個趕著上班的年輕人忍不住問她：「阿姨，每天掃一樣的地，不會膩嗎？」阿姨停下來，笑咪咪地說：「不會啊，我是在幫大家把一天擦乾淨。」這句話讓年輕人想了一整天。後來，越來越多鄰居經過時會跟她說聲早安，還有人特地帶一杯熱豆漿給她。整條巷子的早晨，好像都被她掃得亮亮的。"
+    },
+    {
+      "fruit": "忍耐",
+      "text": "颱風過後，阿明的果園倒了大半，一整年的收成都沒了。鄰居們來看他，站在果園邊，不知道該怎麼安慰。阿明沉默了好一會兒，然後帶著大家慢慢走一圈，指給大家看：「你看，這幾棵根扎得深，都沒倒；那一區的排水，明年要改一改。」隔年春天，他照著自己記下的筆記重新整理果園，樹長得比以前更結實。有人問他怎麼這麼快就重新站起來，阿明說：「樹倒了可以再種，種樹學到的本事，颱風吹不走。」"
+    },
+    {
+      "fruit": "忍耐",
+      "text": "巷子裡有一間小書店，老闆娘每天傍晚都會搬張椅子坐在門口，看著放學的孩子經過。有個小男孩常常站在櫥窗前看書，卻一直不敢走進來。有一天，老闆娘向他招招手：「進來坐著看吧，不用買也沒關係。」從那天起，小男孩幾乎每天都來。一年後的某個傍晚，他拿著一張作文比賽的獎狀衝進店裡：「阿姨！我寫的就是這間書店！」老闆娘看著那張獎狀，心裡熱熱的。原來她每天坐在門口，等的就是這樣的好消息。"
+    },
+    {
+      "fruit": "和平",
+      "text": "小潔剛當媽媽，每天手忙腳亂，常常一整天過去，卻覺得什麼事都沒顧好。鄰居林媽媽看在眼裡，有天端了一碗湯過來，坐下來陪她聊天，還教了她一個方法：「每天早上先問自己，今天最重要的一件事是什麼。其他的，做不完也沒關係。」小潔開始這樣試。有時候最重要的事是陪孩子散步，有時候只是好好吃一頓飯。日子還是一樣忙，可是她的心慢慢定了下來。她說：「原來方向不用很大，一天一件就夠了。」"
+    },
+    {
+      "fruit": "恩慈",
+      "text": "阿偉剛搬到一個陌生的城市，誰都不認識，每天下班就一個人默默回家。巷口麵攤的老闆注意到這個常來的年輕人，每次都偷偷幫他多加一顆滷蛋，順口問一句：「今天工作還順利嗎？」有一天晚上，阿偉實在撐不住了，一口氣說了好多煩惱。老闆一邊煮麵，一邊靜靜聽他說完，最後只說：「急不來啦，先把今天這碗麵吃飽。」那句話很普通，阿偉卻記了好多年。後來他才明白，好的道理常常不在遠方，就在每天經過的路口。"
+    },
+    {
+      "fruit": "良善",
+      "text": "每年過年圍爐，奶奶都會說同一句話：「吃飯要記得留一口給別人。」小時候的佳佳聽到都會偷笑，心想奶奶又在重複了。今年，佳佳第一次一個人在外地過年。除夕晚上，她煮了一鍋熱湯，想起奶奶的話，就多盛了一碗，敲了敲隔壁獨居老伯的門。老伯接過湯碗，愣了一下，接著笑得像個孩子。那一刻，佳佳突然覺得，奶奶那句說了好多年的老話，好像今天才剛說出口。"
+    }
+  ],
+  "9": [
+    {
+      "fruit": "忍耐",
+      "text": "小晴開始學烘焙時，只想趕快做出漂亮的蛋糕。沒想到老師要她第一個月只練兩件事：打蛋、量麵粉。她心裡有點不耐煩，覺得這些也太簡單了，但還是乖乖照做。幾個月後，好朋友生日，她第一次自己動手做生日蛋糕。從頭到尾，每個步驟都穩穩的，一點也不慌。朋友吃了一口，驚訝地問她有什麼祕訣。小晴笑著說：「祕訣就是那一整個月的打蛋。」"
+    },
+    {
+      "fruit": "仁愛",
+      "text": "每到星期五晚上，林媽媽都會多煮一鍋飯，桌上也多擺幾副碗筷。孩子好奇地問：「今天又沒有人說要來，為什麼要多擺？」林媽媽一邊盛湯一邊說：「擺著呀，想來的人看到，就知道這裡有他的位子。」那天晚上，剛搬來的鄰居帶著一盤水果來打招呼，加班晚歸的姪子也來敲門。一張小小的餐桌，很快就坐滿了人，屋子裡熱熱鬧鬧的。"
+    },
+    {
+      "fruit": "喜樂",
+      "text": "阿豪每天下班回家，就窩在沙發上滑手機，常常覺得日子灰灰的，好像少了點什麼。有一天，他心血來潮，換了一條路回家。經過河堤時，他看見夕陽把整條河照成了金色，忍不住停下來，靜靜看了十分鐘。從那天起，他每天都特地繞河堤回家，週末還約了好久不見的朋友一起去騎腳踏車。他說：「只是換一條路走，整個人都亮起來了。」"
+    },
+    {
+      "fruit": "溫柔",
+      "text": "小琪剪了新髮型，興奮地跑去問好朋友：「好看嗎？」好朋友想了一下，溫柔地說：「其實我覺得，妳之前的長度更適合妳。」小琪愣了一下，然後笑了出來：「謝謝妳，願意跟我說真話。」從那以後，小琪每次要做重要的決定，都會先聽聽這位朋友的意見。她們就這樣當了二十年的好朋友。小琪常說：「願意對我說真話的人，是我的寶。」"
+    },
+    {
+      "fruit": "喜樂",
+      "text": "阿翔是班上最愛發問的孩子，每次下課都跑去找老師，一個問題問完，常常又冒出三個新問題。有一天，老師教大家用放大鏡看樹葉的紋路。阿翔回家後，把院子裡每一種葉子都仔細看了一遍，還一張一張畫下來，做成了一本小冊子。隔天，他把小冊子送給老師。老師一頁一頁翻著，笑著說：「我只教了你一點點，你自己卻長出了一整片。」"
+    },
+    {
+      "fruit": "恩慈",
+      "text": "阿傑剛到新公司上班，每天進門都會跟警衛伯伯打招呼，還特地記住了伯伯的名字。有一天下大雨，阿傑的車在停車場發不動，他急得不知道怎麼辦。警衛伯伯看到了，撐著傘走過來，一邊幫他擋雨，一邊打電話找認識的師傅來修。事情解決後，阿傑連聲道謝。伯伯笑著說：「你每天都叫我的名字，我早就把你當自己人了。」阿傑後來常說，他在公司學到的第一課不是工作技巧，而是尊重每一個人。"
+    },
+    {
+      "fruit": "節制",
+      "text": "王老師退休以後，每天只做三件小事：早上去公園散步，中午好好煮一道菜，晚上在燈下寫一頁日記。有人覺得這樣的日子太單調了，她卻說每一天都過得很充實。就這樣過了十年，她把一本本日記整理成一本書，送給以前教過的學生。學生們翻開來，發現每一頁都寫著一個好好過完的日子。"
+    },
+    {
+      "fruit": "和平",
+      "text": "阿芬以前脾氣很急，常常為了一點小事就跟家人吵起來，吵完自己也很難受。後來，她決定練習一件事：要開口之前，先深呼吸三次。剛開始真的很不容易，有時候吸到第二口就忍不住了。可是慢慢地，家裡的爭吵變少了，大家說話也溫和了。最讓她意外的是，自己晚上竟然也睡得比較好。她說：「我本來以為是為了家人學的，沒想到最先輕鬆下來的，是我自己。」"
+    },
+    {
+      "fruit": "信實",
+      "text": "夜市裡，有兩家滷味攤面對面。一家喇叭開得很大聲，招牌燈閃個不停；另一家只點了一盞燈，老闆低著頭，安安靜靜地切菜。小敏第一次去，很自然就被熱鬧的那一家吸引過去。後來有一次，她試了安靜的那一家，從此就成了老客人。朋友問她為什麼，她說：「安靜的那一家，每一樣都是用心滷出來的，吃得出來。」"
+    },
+    {
+      "fruit": "節制",
+      "text": "阿成一直有個心願：帶爸媽去日本玩一趟。為了這個心願，他開始每個月存一點錢。朋友常約他逛街、吃大餐，他總是笑著說：「等我存夠了，換我請客！」不是不想去，是他很清楚自己要往哪裡走。一年後，他真的帶著爸媽出國了。回來以後，他也沒忘記當初說過的話，請了一大桌朋友吃飯。大家都說，跟說話算話的人做朋友，很放心。"
+    },
+    {
+      "fruit": "良善",
+      "text": "小凱在便利商店結完帳，走到門口才發現，工讀生多找了他一百元。他想了想，又轉身走回櫃台，把錢還給對方。年輕的工讀生愣了一下，連聲道謝，說晚上結帳時差點要自己掏錢補。那天晚上，小凱吃著一碗再普通不過的泡麵，卻覺得特別香。原來心裡踏實的時候，連泡麵都變好吃了。"
+    },
+    {
+      "fruit": "仁愛",
+      "text": "阿珠阿姨包的粽子，是整條巷子公認最好吃的，鄰居們都想學。有人勸她：「祕方自己留著就好，教出去就不稀奇了。」阿珠阿姨卻每年端午節前，都打開家門，邀大家一起來包。幾年下來，整條巷子的人都會包粽子了，還有年輕人改良出新口味，回過頭來教她。阿珠阿姨笑得好開心：「你看，教出去的，都變成更多回來了。」"
+    }
+  ],
+  "10": [
+    {
+      "fruit": "喜樂",
+      "text": "阿美有一本「晴天筆記本」。心情好的日子，她會在裡面寫下一件小事：朋友請她喝的一杯熱奶茶、下班路上看到的彩虹、有人真心對她說的一聲謝謝。有一陣子，工作很不順利，她每天都提不起勁。某個晚上，她想起那本筆記本，翻開來一頁一頁慢慢讀。讀著讀著，心裡好像有什麼地方慢慢暖了起來。她說：「晴天收起來的光，到了下雨天，會回來照著我。」"
+    },
+    {
+      "fruit": "信實",
+      "text": "小傑剛開始在社區關懷據點當志工，每個星期二下午陪長輩下棋。他話不多，也不太會逗人開心，常常擔心自己是不是做得不夠好。可是不管颳風下雨，他從來沒有缺席過。半年後的某一天，負責的阿姨悄悄跟他說：「你知道嗎？陳伯伯每到星期二，一大早就把棋盤擺好，坐在那裡等你。」小傑聽了，心裡暖暖的。他這才發現，自己這份默默的踏實，已經成了別人心裡的安心。"
+    },
+    {
+      "fruit": "節制",
+      "text": "會議室裡，大家為了一個方案爭得面紅耳赤，只有老陳一直安靜地聽。等大家都說完了，他才慢慢開口：「我想，我們是不是都希望讓客人更方便？」會議室突然安靜下來，大家互相看了看，發現其實想的是同一件事。散會後，剛進公司的新人好奇地問他：「你怎麼能一直不說話？」老陳笑了笑：「話留到最需要的時候，才有份量。」"
+    },
+    {
+      "fruit": "恩慈",
+      "text": "小如考完一場很重要的考試，覺得自己沒考好，心情很低落，一個人坐在樓梯間發呆。剛好經過的工友伯伯沒有多問，只是遞給她一瓶冰涼的水，輕輕地說：「一次考試，不會決定一個人。」很多年後，小如成了一位老師。每次看到學生垂頭喪氣，她都會想起那個下午、那瓶水，和那句話。原來一句好話，可以在一個人的心裡流好多年。"
+    },
+    {
+      "fruit": "良善",
+      "text": "菜市場的阿桃姨，每天都會真心稱讚來買菜的客人：「妳今天氣色真好！」「這孩子好有禮貌喔！」她的攤子不是最便宜的，客人卻是最多的。有人好奇地問她做生意的祕訣，阿桃姨笑著說：「菜錢大家都付得起，可是好聽的話，很多人已經很久沒聽到了。」"
+    },
+    {
+      "fruit": "溫柔",
+      "text": "小安剛開始學游泳時，教練每次都提醒她：「先學會換氣，再求快。」她有時候覺得這樣進步好慢，但還是一次又一次地照著練。半年後，她報名參加了泳渡日月潭。游到一半，身邊很多人都累得停下來，她卻一口氣接著一口氣，穩穩地往前游，最後游到了對岸。上岸後，她第一件事就是傳訊息給教練：「謝謝你那時候一直提醒我。」"
+    },
+    {
+      "fruit": "信實",
+      "text": "阿嬤每天早上五點就起床，到後院的小菜園澆水、拔草。她種得不多，卻從來沒有停過一天。一年下來，鄰居、親戚家的餐桌上，幾乎都吃過阿嬤種的空心菜和地瓜葉。孫子心疼地問她：「阿嬤，每天這麼早起來，不累嗎？」阿嬤笑著擦擦手上的泥土：「手動一動，日子就滿了。」"
+    },
+    {
+      "fruit": "忍耐",
+      "text": "連下了一個星期的大雨，老街上的招牌被風吹得歪七扭八。雨停的那天早上，街坊們都出來幫忙收拾，這才發現，街口那棵老榕樹只掉了幾根枝葉，還穩穩地站在原地。賣豆花的阿伯說，這棵樹三十年前就在了，根早就悄悄鑽到馬路底下。一個年輕人摸著粗粗的樹幹，小聲地說：「以後我也想當這樣的人，風再大，也站得住。」"
+    },
+    {
+      "fruit": "良善",
+      "text": "社區的老醫生退休搬走了，診所改成了一間咖啡店。可是街坊鄰居聊天時，還是常常提起他：半夜有人發燒，他一定開門看診；遇到手頭緊的人，他總是揮揮手說「下次再給就好」。咖啡店老闆聽了好多這樣的故事，後來在牆上掛了一張老醫生的照片，旁邊寫著一行字：「這裡曾經有一個人，把大家照顧得很好。」"
+    },
+    {
+      "fruit": "和平",
+      "text": "阿宏在公司尾牙抽中了頭獎，是一台很貴的新機車。他開心了整整一個星期，接著煩惱就來了：停在哪裡怕被刮到，下雨天怕淋濕，每天出門前都要檢查好幾遍。有一天，他索性騎著那台舊腳踏車，慢慢騎到河邊。涼涼的風吹過來，他突然笑了出來，好久沒有這麼輕鬆了。後來，他把新機車賣了，用那筆錢跟幾個老朋友去了一趟小旅行。他說：「讓人心裡輕鬆的，才是真正的禮物。」"
+    },
+    {
+      "fruit": "仁愛",
+      "text": "小婷到咖啡店當工讀生的第一天，緊張到把客人點的拿鐵做成了美式。客人皺了一下眉頭，小婷的臉一下子紅了起來。老闆娘趕緊走過來，笑著對客人說：「不好意思，這杯算我請客。她今天第一天上班，以後一定會是我們店裡最會煮咖啡的人。」客人聽了也笑了，小婷這才鬆了一口氣。三年後，小婷真的成了店裡最受歡迎的咖啡師。每次有新的工讀生來，她都會說：「是老闆娘那天，替我把缺口蓋了起來。現在，換我來替你們蓋。」"
+    },
+    {
+      "fruit": "忍耐",
+      "text": "冬天的時候，小雅在陽台種了一盆鬱金香球根。過了好幾個月，土裡一點動靜都沒有，有時候她也會懷疑，是不是自己種壞了。那段日子，她自己也過得不太順，每天看著那盆安安靜靜的土，好像也在等待自己。但她還是每天照樣澆水。春天的某個早上，土裡冒出了一點小小的綠芽。小雅蹲在陽台看了好久，心裡想：原來在等待的時候，盼望早就在土裡悄悄長根了。"
+    }
+  ]
+};
+
+// ── 默想：每篇故事結尾的引導，對應 STORIES 的順序 ──
+const REFLECTS = {
+  "8": [
+    "小芸終於不再等「有空」了。我們心裡，大概都有一件「等有空再說」的事吧？也許今天，就是可以開始的那一天。",
+    "做了二十年的老師傅，也願意說一句「你教我」。原來向人請教，是讓人越活越年輕的事。說不定今天，也有人正等著教我們一點新東西。",
+    "心裡亂成一團的時候，真的很難睡好。美玲的方法很簡單：寫下來。如果今天心裡也有點亂，可以先寫一件在下面的心情故事裡，寫出來，心裡就會鬆一點。",
+    "每個地方，都有默默把事情做好的人。阿凱看見了，也說出來了。我們身邊的那個人，或許也正需要一句「我有看到」。",
+    "陳伯沒有做什麼大事，只是把皮夾好好收著，耐心等了三天。原來讓人安心的事，常常就藏在這樣的小地方。",
+    "阿公的筆記本裡，只有幾句簡單的話，卻陪了小宇好多年。我們心裡，是不是也收著某一句話，到現在還陪著自己？",
+    "同樣是掃地，阿姨把它當成在幫大家把一天擦乾淨。手上的事是同一件，心情換了，好像就不一樣了。累的時候，慢慢做也沒關係。",
+    "看著倒了一半的果園，阿明也沉默了好久。經歷風雨的時候，先難過、先休息，都沒有關係；那些學到的本事，會一直留在身上。",
+    "一句「進來坐吧」，就讓小男孩有了一個可以待的地方。願我們都能成為向人招手的人，也都能遇見向我們招手的人。",
+    "林媽媽的方法很簡單：先找出今天最重要的一件事，其他的做不完也沒關係。原來日子不用全部顧好，一天一件就夠了。",
+    "麵攤老闆沒講大道理，只是靜靜聽完，再讓阿偉好好吃一碗麵。撐得很累的日子，有人聽、有碗熱麵，就很夠了。願我們都有，也都給得出去。",
+    "一碗多盛的熱湯，讓隔壁的老伯笑得像個孩子。原來「多留一口」，不一定是很多東西，一句問候、一個笑容都算。"
+  ],
+  "9": [
+    "一整個月的打蛋，看起來好慢，卻讓後來的每一步都穩穩的。如果我們正在練一件很慢的事，那些不起眼的日子，其實都在打根基。",
+    "「擺著呀，想來的人看到，就知道這裡有他的位子。」被留一個位子的感覺，好溫暖。我們也能替誰留一個位子，一則訊息、一點時間都算。",
+    "阿豪只是換了一條路回家，就看見了金色的河。日子灰灰的時候，也許不用改變很多，換一個小地方，光就進來了。",
+    "好朋友說真話的時候很體貼，小琪聽真話的時候很大方。願我們身邊都有這樣的朋友，也都能當這樣的朋友。",
+    "老師只教了一點點，阿翔自己長出了一整片。每天學到的一件小事，都像一顆種子；寫下來，說不定哪天就長成一片了。",
+    "被叫出名字的那一刻，人心裡會想：原來有人記得我。警衛伯伯是這樣，其實我們每一個人，也都是這樣。",
+    "王老師每天只做三件小事，卻把每一天都過得很充實。原來日子不用排得很滿，好好做完一件小事，這一天就算數。",
+    "脾氣上來的時候，最難受的常常是自己。阿芬的方法只有三口氣，卻讓她和家人都輕鬆了。這不用一次就學會，我們可以慢慢練習：話到嘴邊之前，先讓心走慢一步。",
+    "最熱鬧的那一家，不一定最用心。我們身邊，一定也有安安靜靜、卻很用心的人，聽到一句謝謝，他們一定會很開心。",
+    "阿成不是不想去玩，是他知道自己要往哪裡走。每個人心裡，都有一個想慢慢完成的小心願；一步一步往前走，路就會越走越近。",
+    "那碗泡麵特別香，是因為心裡很踏實。這種感覺好珍貴，如果最近也有過一次，可以寫在下面，留給以後的自己。",
+    "祕方教出去，回來的反而更多。我們會的每一件小事，都可能是別人正想學的；分出去，它就變成更多了。"
+  ],
+  "10": [
+    "阿美把晴天的小事收起來，留給下雨天。今天如果也有一件讓嘴角揚起來的小事，寫在下面，它就是我們的晴天筆記本。",
+    "小傑擔心自己做得不夠好，其實他的出現，早就是別人的安心。就算覺得自己很普通，你在那裡，可能就是某個人的安心。",
+    "老陳先把大家的話聽完，才說出最需要的那一句。原來最有份量的話，常常出現在願意先聽的人口中。",
+    "工友伯伯的一瓶水、一句話，陪了小如好多年。如果今天你也有點低落，這句話也想送給你：一件事，不會決定你這個人。",
+    "阿桃姨說，好聽的話，很多人已經很久沒聽到了。說不定我們自己也是。今天的一句真心稱讚，可以送給別人，也可以留給自己。",
+    "一口氣接著一口氣，小安就這樣游到了對岸。那些當時覺得好慢的提醒，後來都成了力氣。想起那些提醒過我們的人，心裡也會多一分感謝。",
+    "「手動一動，日子就滿了。」今天我們的手，也做了好多事吧。不管多小，每一件都算數。",
+    "老榕樹的根，是三十年來一點一點長出來的。我們每天默默在做的事，也正在往下扎根，只是現在還看不出來而已。",
+    "老醫生搬走了，大家卻還記得他的好。我們心裡，一定也住著這樣一個人；想起他的時候，那份好，也可以傳給下一個人。",
+    "頭獎帶來的，原來不全是開心。讓心裡輕鬆的，才是真正的禮物。願我們擁有的東西，都讓日子更輕盈，而不是更沉重。",
+    "老闆娘一句話，就替小婷蓋住了缺口。誰都有手忙腳亂的時候，那一刻，最需要的就是這樣一句話。願我們都說得出這句話，也都能在需要的時候，聽到這句話。",
+    "心裡那盆還沒發芽的土，不代表什麼都沒發生。小雅照樣澆水，盼望就在土裡一點一點長出根來。等待的路上，我們不是一個人，一起慢慢澆水就好。"
+  ],
+  "11": [
+    "秤是給客人看的，也是給自己的心看的。一件小事做得剛剛好，那份踏實，連晚上都睡得特別安穩。",
+    "說出「我不會」，需要很大的勇氣。阿倫說出口的那一刻，大家反而都靠了過來。原來承認不會，就是學會的開始。",
+    "小蓉沒有想那麼多，只是照著心裡覺得對的方向走。每個人心裡都有一個指南針，安靜下來的時候，最聽得見它。",
+    "一個小木架、幾本書，整條巷子就慢慢暖了起來。善意不用很大，一張紙條、一聲問候，就能讓一個角落亮起來。",
+    "心事被好好收著的感覺，好安心。願我們都能成為替人收好心事的人，也都能遇見替我們收好心事的人。",
+    "一個人想，越想越慌；大家一起想，心就安了。把煩惱說給一個信得過的人聽，就像路上多了一個同行的人，再遠的路，好像也近了一些。",
+    "一聲「謝謝」，讓司機大哥笑了，也讓阿哲的通勤完全不一樣。原來善待別人的時候，自己的心情也跟著好了起來。",
+    "十五年，阿弘撒下的種子才回到球場。如果現在做的事還看不到結果，也沒有關係，種子在土裡，也正在長。",
+    "老闆娘給出去的是麵包，收回來的是一整條巷子的心。我們能給的，不一定是東西，一句關心，也許哪天就會回到身邊。",
+    "秀琴去陪長輩，結果被滋潤的是她自己。心裡空空的時候，有時候去關心一個人，反而會發現自己的心也被填滿了一些。",
+    "三十年前的一棵小樹苗，現在成了大家乘涼的地方。我們今天做的一點點好，說不定也會長成別人的樹蔭。",
+    "周伯伯每天只想做一點好事，沒想到，好事全都回來找他。今天的一件小小好事，也許就是我們留給這一天最溫暖的記號。"
+  ]
+};
+
+// ── 短禱告：每章 12 句（求祢……），對應 1～12 月；開頭結尾依早安／午安／晚安變化 ──
+const PRAYERS = {
+  "11": [
+    "讓我在小事上也誠實，心裡常有平安。",
+    "給我勇氣說出「我不會」，也給我願意學習的心。",
+    "做我心裡的指南針，帶我走正直的路。",
+    "讓我的善意，成為身邊的人的溫暖。",
+    "教我好好收著別人交給我的心事，做一個讓人放心的人。",
+    "在我拿不定主意的時候，讓我願意開口問人，也遇見願意幫我的人。",
+    "讓我善待身邊的每一個人，也讓我的心常常柔軟。",
+    "在我還看不到結果的時候，給我耐心，繼續撒下好的種子。",
+    "讓我的手樂意張開，把祢給我的分享出去。",
+    "在我心裡乾乾的時候滋潤我，也讓我成為滋潤別人的人。",
+    "讓我一天一天活出好樣子，成為別人可以歇一歇的地方。",
+    "讓我天天願意找一件好事來做，也讓我看見祢預備的恩典。"
+  ],
+  "8": [
+    "給我一顆肯早早出發的心，在還來得及的時候，學會珍惜身邊的人和事。",
+    "讓我願意低下心來，向每一個人學習。",
+    "賜我清楚的心思，知道下一步該往哪裡走。",
+    "讓我的嘴說誠實又溫柔的話。",
+    "扶持我走正直的路，一步一步都踏實。",
+    "讓我看重智慧，勝過看重口袋裡的錢。",
+    "讓我帶著歡喜，做手上的每一件事。",
+    "讓我在每一次風雨之後，都學到新的功課。",
+    "給我耐心，天天等候祢的好消息。",
+    "做我每天的方向，讓我的心安定下來。",
+    "開我的眼睛，看見祢放在路口的提醒，也讓我成為別人路口的那份溫暖。",
+    "讓我天天從祢的話裡，看見新的亮光。"
+  ],
+  "9": [
+    "幫助我把根基打穩，不急著看見成果。",
+    "讓我成為別人願意靠近的人。",
+    "帶我走光明的路，讓我的日子也亮起來。",
+    "給我一顆柔軟的心，聽得進朋友的真話。",
+    "讓我常保好學的心，一點一點長大。",
+    "教我尊重每一個人，像祢看重我一樣。",
+    "讓我好好過每一天，不讓日子白白溜走。",
+    "賜我智慧，先從改變我自己開始。",
+    "讓我分辨真正的好，不被熱鬧吸走。",
+    "堅定我的腳步，朝著對的方向一直走。",
+    "保守我的心，讓我得來的每一分都光明正大。",
+    "讓我樂意分享，把祢給我的好，傳給更多人。"
+  ],
+  "10": [
+    "讓我在晴天裡記得祢的恩典，到了雨天也想得起來。",
+    "讓我踏實地過每一天，成為身邊的人的安心。",
+    "管住我的口，讓我說話有分寸。",
+    "讓我的話，能滋潤身邊疲憊的人。",
+    "讓我不吝嗇說出鼓勵和讚美。",
+    "給我受教的心，感謝每一個提醒我的人。",
+    "祝福我手中的工作，讓我忠心做好每一件小事。",
+    "讓我的根扎在祢裡面，風雨來時也站得穩。",
+    "讓我活出美好的見證，成為別人心裡溫暖的記憶。",
+    "讓我看重真正的祝福，不為多餘的東西失去平安。",
+    "教我用愛遮蓋別人的不足，像祢這樣包容我。",
+    "在我等得很累的時候陪著我，讓我心裡仍有一盞小燈。"
+  ]
+};
+const MODES = {
+  morning:   { greet:"早安", story:"今日心情故事", open:"親愛的天父，謝謝祢賜給我新的一天。", bless:"早安，願今天的你被祝福圍繞。" },
+  afternoon: { greet:"午安", story:"今日心情故事", open:"親愛的天父，謝謝祢陪我走到此刻。", bless:"午安，停下來深呼吸，謝謝此刻擁有的一切。" },
+  night:     { greet:"晚安", story:"今晚心情故事", open:"親愛的天父，謝謝祢陪我走過今天。", bless:"晚安，願天父的愛陪你安穩入睡。" }
+};
+function currentMode(){ const h = new Date().getHours(); return h>=5&&h<11 ? "morning" : (h>=11&&h<18 ? "afternoon" : "night"); }
+
+const WEEK = "日一二三四五六";
+const now = new Date();
+const todayD = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+let cur = new Date(todayD);
+const $ = id => document.getElementById(id);
+const same = (a,b) => a.getTime() === b.getTime();
+const daysIn = d => new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+const key = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function storyFor(d){
+  const list = STORIES[d.getDate()];
+  return list ? list[d.getMonth() % list.length] : null;
+}
+function maximFor(d){
+  const list = MAXIMS[d.getDate()];
+  return list ? list[d.getMonth() % list.length] : null;
+}
+
+// ── 畫面 ──
+function render(){
+  const day = cur.getDate(), m = cur.getMonth();
+  $("dateText").textContent = `${m+1} 月 ${day} 日（${WEEK[cur.getDay()]}）`;
+  $("today").hidden = same(cur, todayD);
+
+  $("chTitle").textContent = `箴言 第 ${day} 章`;
+  const verses = TEXT[day];
+  if (verses){
+    $("verLine").hidden = false;
+    $("vlist").innerHTML = verses.map((v,i)=>`<li data-v="${i+1}"><span class="n">${i+1}</span><span class="vt${hlClass(day,i+1)}">${esc(v)}</span></li>`).join("");
+  } else {
+    $("verLine").hidden = true;
+    $("vlist").innerHTML = `<li class="active"><span class="n"></span><span class="vt">這一章的經文還沒放進來，可以先按下面的「參考其他版本」到網路上讀。</span></li>`;
+  }
+
+  $("tcvLink").href = `https://www.bible.com/zh-TW/bible/3283/PRO.${day}.TCV2019T`;
+  $("tcvLink").textContent = "參考其他版本 ›";
+
+  const st = storyFor(cur);
+  $("storyText").textContent = st ? st.text : `第 ${day} 章的心情故事還在準備中。`;
+  $("fruit").textContent = st ? st.fruit : "";
+  $("fruit").hidden = !st;
+  const rl = REFLECTS[day], rf = (st && rl) ? rl[m % rl.length] : "";
+  reflectBase = rf;
+  $("reflectText").textContent = rf;
+  $("reflect").hidden = !rf;
+  applyMode();
+  const pl = PRAYERS[day];
+  const md = MODES[currentMode()];
+  $("prayerText").textContent = pl ? `${md.open}求祢${pl[m % pl.length]}奉耶穌基督的名禱告，阿門。` : `${md.open}求祢引導我明白今天讀的話。奉耶穌基督的名禱告，阿門。`;
+  $("bless").textContent = md.bless;
+  $("chap").textContent = `箴言 第 ${day} 章`;
+  const mx = maximFor(cur);
+  // 格言在逗號處換行，避免字被拆開
+  $("maxim").innerHTML = mx ? mx.split(/(?<=，)/).map(x=>`<span class="seg">${esc(x)}</span>`).join("") : `第 ${day} 章的格言還在準備中。`;
+  $("maxim").classList.toggle("empty", !mx);
+  $("monthTag").textContent = mx ? `${m+1} 月的格言 · 每月換一句` : "";
+
+  // 進度表
+  $("planSum").textContent = `${m+1} 月讀經進度`;
+  const dots = $("dots"); dots.innerHTML = "";
+  const n = daysIn(cur);
+  for (let i=1;i<=31;i++){
+    const b = document.createElement("button");
+    b.className = "dot"; b.textContent = i;
+    b.setAttribute("aria-label", `第 ${i} 章`);
+    if (MAXIMS[i]) b.classList.add("has");
+    const di = new Date(cur.getFullYear(), m, i);
+    if (i > n) b.disabled = true;
+    else {
+      if (di < todayD) b.classList.add("past");
+      if (i === day) b.classList.add("sel");
+      b.onclick = () => go(di);
+    }
+    dots.appendChild(b);
+  }
+
+  // 本章 12 句
+  const list = MAXIMS[day];
+  $("allBox").hidden = !list;
+  if (list){
+    $("allSum").textContent = `第 ${day} 章的 ${list.length} 句格言`;
+    $("allList").innerHTML = list.map((t,i)=>`<li class="${i===m?'now':''}"><span>${i+1} 月</span>${esc(t)}</li>`).join("");
+  }
+
+  loadNote();
+}
+
+let reflectBase = "";
+function applyMode(){
+  const mode = currentMode(), md = MODES[mode];
+  document.body.classList.toggle("night", mode === "night");
+  $("greet").textContent = md.greet;
+  $("storyLabel").textContent = md.story;
+  // 晚安時段，默想前面加上「親愛的，」
+  if (reflectBase) $("reflectText").textContent = (mode === "night" ? "親愛的，" : "") + reflectBase;
+}
+// 時段跨過去（例如 10:59 → 11:00）時自動切換問候與配色
+setInterval(applyMode, 60000);
+
+function go(d){ cur = new Date(d.getFullYear(), d.getMonth(), d.getDate()); render(); showPage(1, 0); }
+$("prev").onclick = () => go(new Date(cur.getFullYear(), cur.getMonth(), cur.getDate()-1));
+$("next").onclick = () => go(new Date(cur.getFullYear(), cur.getMonth(), cur.getDate()+1));
+$("today").onclick = () => go(todayD);
+// ── 分頁：經文 → 心情故事 → 今日格言 ──
+let page = 1;
+function showPage(n, dir){
+  page = n;
+  [1,2,3].forEach(i => {
+    const el = $("p"+i);
+    el.hidden = i !== n;
+    el.classList.remove("in-next","in-back");
+  });
+  const el = $("p"+n);
+  if (dir) { void el.offsetWidth; el.classList.add(dir > 0 ? "in-next" : "in-back"); }
+  window.scrollTo({top:0});
+  if (n === 1) requestAnimationFrame(layoutFrame);
+}
+$("toStory").onclick = () => showPage(2, 1);
+$("toMaxim").onclick = () => showPage(3, 1);
+document.querySelectorAll(".back").forEach(b => b.onclick = () => showPage(+b.dataset.go, -1));
+
+// ── 經文框：高度貼齊螢幕，正在讀的那一節變色 ──
+const frame = $("frame");
+let padTop = 0, hintDone = false;
+function layoutFrame(keep){
+  if (page !== 1) return;
+  const top = frame.getBoundingClientRect().top + window.scrollY;
+  const h = Math.max(260, window.innerHeight - top - 40);
+  frame.style.height = h + "px";
+  padTop = Math.round(h * 0.18);
+  frame.style.paddingTop = padTop + "px";
+  frame.style.scrollPaddingTop = padTop + "px";
+  frame.style.paddingBottom = Math.max(0, h - padTop - $("endbox").offsetHeight) + "px";
+  if (!keep) frame.scrollTop = 0;
+  markActive();
+}
+function markActive(){
+  const items = [...$("vlist").children, $("endbox")];
+  const line = frame.scrollTop + padTop + 6;
+  let idx = 0;
+  items.forEach((el,i) => { if (el.offsetTop <= line) idx = i; });
+  items.forEach((el,i) => {
+    el.classList.toggle("active", i === idx);
+    el.classList.toggle("read", i < idx);
+  });
+  const total = items.length - 1;
+  $("prog").textContent = TEXT[cur.getDate()] ? (idx >= total ? "讀完了" : `${idx+1} / ${total}`) : "";
+  if (idx > 0 && !hintDone){ hintDone = true; $("hint").classList.add("gone"); }
+}
+let ticking = false;
+frame.addEventListener("scroll", () => { if (!ticking){ ticking = true; requestAnimationFrame(() => { ticking = false; markActive(); }); } }, {passive:true});
+window.addEventListener("resize", () => layoutFrame(true));
+
+// ── 點經文：標記、複製、對照、寫進心情故事 ──
+const hlKey = (ch,v) => `hl:${ch}:${v}`;
+function hlGet(ch,v){ try { return localStorage.getItem(hlKey(ch,v)) || ""; } catch(e){ return ""; } }
+function hlSet(ch,v,c){ try { c ? localStorage.setItem(hlKey(ch,v), c) : localStorage.removeItem(hlKey(ch,v)); } catch(e){} }
+function hlClass(ch,v){ const c = hlGet(ch,v); return c ? " hl-"+c : ""; }
+let picked = null;
+$("vlist").addEventListener("click", e => {
+  const li = e.target.closest("li[data-v]"); if (!li) return;
+  picked = li;
+  document.querySelectorAll(".vlist li.picked").forEach(x => x.classList.remove("picked"));
+  li.classList.add("picked");
+  const ch = cur.getDate(), v = +li.dataset.v;
+  $("sRef").textContent = `箴言 ${ch}:${v}`;
+  $("sText").textContent = TEXT[ch][v-1];
+  $("sCompare").href = `https://www.bible.com/zh-TW/bible/3283/PRO.${ch}.${v}.TCV2019T`;
+  const c = hlGet(ch,v);
+  document.querySelectorAll(".cdot").forEach(d => d.classList.toggle("on", !!c && d.dataset.c === c));
+  $("sheet").hidden = false;
+});
+function closeSheet(){ $("sheet").hidden = true; if (picked) picked.classList.remove("picked"); }
+$("sClose").onclick = closeSheet;
+$("sheet").addEventListener("click", e => { if (e.target === $("sheet")) closeSheet(); });
+$("sCompare").addEventListener("click", () => setTimeout(closeSheet, 300));
+document.querySelectorAll(".cdot").forEach(d => d.onclick = () => {
+  if (!picked) return;
+  const ch = cur.getDate(), v = +picked.dataset.v, c = d.dataset.c;
+  hlSet(ch,v,c);
+  const vt = picked.querySelector(".vt");
+  vt.className = "vt" + (c ? " hl-"+c : "");
+  closeSheet();
+});
+function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(()=>t.classList.remove("show"), 1800); }
+$("sCopy").onclick = async () => {
+  const ch = cur.getDate(), v = +picked.dataset.v;
+  const text = `${TEXT[ch][v-1]}（箴言 ${ch}:${v}，和合本）`;
+  try { await navigator.clipboard.writeText(text); }
+  catch(e){ const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch(_){} ta.remove(); }
+  closeSheet(); toast("已複製");
+};
+$("sNote").onclick = () => {
+  const ch = cur.getDate(), v = +picked.dataset.v;
+  const line = `箴言 ${ch}:${v}「${TEXT[ch][v-1]}」\n`;
+  note.value = note.value ? note.value.replace(/\s*$/, "\n") + line : line;
+  note.dispatchEvent(new Event("input"));
+  closeSheet(); toast("已放進最後一頁的心情故事");
+};
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("sheet").hidden) closeSheet(); });
+
+// ── 心得：優先存在帳號（只有自己看得到），不行時存在這台裝置 ──
+let store = null;          // {get(k), set(k,obj), all()}
+let loadedText = "";
+let saving = false;
+const note = $("note"), saveBtn = $("save"), statusEl = $("status");
+
+const local = {
+  get: async k => { try { return JSON.parse(localStorage.getItem("note:"+k)); } catch(e){ return null; } },
+  set: async (k,o) => { localStorage.setItem("note:"+k, JSON.stringify(o)); },
+  all: async () => {
+    const out = [];
+    try { for (let i=0;i<localStorage.length;i++){ const k = localStorage.key(i); if (k.startsWith("note:")) out.push(JSON.parse(localStorage.getItem(k))); } } catch(e){}
+    return out.filter(Boolean).sort((a,b)=> a.date < b.date ? 1 : -1);
+  },
+  where: "這台裝置"
+};
+
+async function connect(){
+  try {
+    if (!window.claude || !claude.use) return local;
+    const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+    if (!db || !user) return local;
+    const uid = await user.id();
+    if (!uid) return local;
+    const col = db.collection("data/users/" + uid);
+    return {
+      get: async k => { const s = await col.doc(k).get(); return s.exists ? s.data() : null; },
+      set: async (k,o) => { await col.doc(k).set(o); },
+      all: async () => { const q = await col.orderBy("date","desc").limit(200).get(); return q.docs.map(d=>d.data()); },
+      where: "你的帳號"
+    };
+  } catch(e){ return local; }
+}
+
+async function loadNote(){
+  const k = key(cur);
+  note.value = ""; loadedText = "";
+  saveBtn.disabled = true;
+  if (!store){ note.disabled = true; statusEl.textContent = "載入中…"; return; }
+  note.disabled = false;
+  statusEl.textContent = "";
+  try {
+    const timer = setTimeout(()=>{ statusEl.textContent = "心情故事暫時讀不到，稍後再試。"; }, 10000);
+    const o = await store.get(k);
+    clearTimeout(timer);
+    if (k !== key(cur)) return;           // 已切換日期
+    if (o && o.text){ note.value = o.text; loadedText = o.text; statusEl.textContent = "已儲存"; }
+  } catch(e){ statusEl.textContent = "心情故事暫時讀不到，稍後再試。"; }
+}
+
+note.addEventListener("input", () => {
+  const changed = note.value !== loadedText;
+  saveBtn.disabled = !changed || saving;
+  statusEl.textContent = changed ? "尚未儲存" : (loadedText ? "已儲存" : "");
+});
+
+saveBtn.onclick = async () => {
+  if (!store || saving) return;
+  const k = key(cur), text = note.value;
+  saving = true; saveBtn.disabled = true; statusEl.textContent = "儲存中…";
+  try {
+    await store.set(k, { date:k, chapter:cur.getDate(), maxim: maximFor(cur) || "", text, updatedAt: new Date().toISOString() });
+    if (k === key(cur)){ loadedText = text; statusEl.textContent = `已儲存到${store.where}`; }
+    loadJournal();
+  } catch(e){
+    if (store !== local){ store = local; try { await local.set(k, { date:k, chapter:cur.getDate(), maxim: maximFor(cur) || "", text, updatedAt:new Date().toISOString() }); loadedText = text; statusEl.textContent = "帳號存不進去，先存在這台裝置"; } catch(_){ statusEl.textContent = "存不進去，請先把文字複製起來"; } }
+    else statusEl.textContent = "存不進去，請先把文字複製起來";
+  }
+  saving = false;
+  saveBtn.disabled = note.value === loadedText;
+};
+
+async function loadJournal(){
+  const ul = $("journal");
+  if (!store){ ul.innerHTML = `<li class="h">載入中…</li>`; return; }
+  try {
+    const items = (await store.all()).filter(o => o && o.text && o.text.trim());
+    if (!items.length){ ul.innerHTML = `<li><div class="h">還沒有寫過心情故事。</div></li>`; return; }
+    ul.innerHTML = items.map(o => {
+      const [y,mo,d] = o.date.split("-").map(Number);
+      return `<li><div class="h">${mo} 月 ${d} 日 · 箴言 ${o.chapter} 章 · <button data-d="${o.date}">打開這天</button></div><div class="t">${esc(o.text)}</div></li>`;
+    }).join("");
+    ul.querySelectorAll("button[data-d]").forEach(b => b.onclick = () => { const [y,mo,d] = b.dataset.d.split("-").map(Number); go(new Date(y,mo-1,d)); });
+  } catch(e){ ul.innerHTML = `<li><div class="h">紀錄暫時讀不到。</div></li>`; }
+}
+
+render();
+showPage(1, 0);
+connect().then(s => { store = s; loadNote(); loadJournal(); });
+</script>
+</body>
+</html>
