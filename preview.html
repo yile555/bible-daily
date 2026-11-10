@@ -140,8 +140,8 @@ details p{font-size:14px;color:var(--muted);margin:0 0 12px}
 .frame::-webkit-scrollbar{display:none}
 .vlist{list-style:none;margin:0;padding:0 22px}
 .vlist li{scroll-snap-align:start;padding:10px 0;font-family:var(--font-display);font-size:19px;line-height:1.85;
-  color:var(--muted);opacity:.55;transition:opacity .25s,color .25s;cursor:pointer;display:grid;grid-template-columns:1.9em 1fr;-webkit-tap-highlight-color:transparent}
-.vlist li .n{font-family:var(--font-body);font-size:12px;font-weight:700;color:var(--gold);padding-top:.55em;font-variant-numeric:tabular-nums}
+  color:var(--muted);opacity:.55;transition:opacity .25s,color .25s;cursor:pointer;position:relative;padding-left:1.9em;-webkit-tap-highlight-color:transparent}
+.vlist li .n{position:absolute;left:0;top:calc(10px + .55em);font-family:var(--font-body);font-size:12px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
 .vlist li.read{opacity:.35}
 .vlist li.active{opacity:1;color:var(--ink)}
 .vlist li.active .n{color:var(--accent)}
@@ -890,7 +890,7 @@ function showPage(n, dir){
   const el = $("p"+n);
   if (dir) { void el.offsetWidth; el.classList.add(dir > 0 ? "in-next" : "in-back"); }
   window.scrollTo({top:0});
-  if (n === 1) requestAnimationFrame(layoutFrame);
+  if (n === 1) requestAnimationFrame(() => layoutFrame(dir < 0));
 }
 $("toStory").onclick = () => showPage(2, 1);
 $("toMaxim").onclick = () => showPage(3, 1);
@@ -902,8 +902,11 @@ let padTop = 0, hintDone = false;
 function layoutFrame(keep){
   if (page !== 1) return;
   const top = frame.getBoundingClientRect().top + window.scrollY;
-  const h = Math.max(260, window.innerHeight - top - 40);
+  let h = Math.max(260, window.innerHeight - top - 84);
   frame.style.height = h + "px";
+  // 確保整頁不會超出螢幕（不讓整個畫面捲動）
+  const over = document.documentElement.scrollHeight - window.innerHeight;
+  if (over > 0 && h - over >= 260){ h -= over; frame.style.height = h + "px"; }
   padTop = Math.round(h * 0.18);
   frame.style.paddingTop = padTop + "px";
   frame.style.scrollPaddingTop = padTop + "px";
