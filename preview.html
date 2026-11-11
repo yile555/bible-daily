@@ -197,7 +197,18 @@ body.night #p3 details{background:#192122}
 .vnotes .h{font-size:12px;color:var(--muted);display:flex;gap:10px;align-items:center}
 .vnotes .h button{border:none;background:none;color:var(--muted);font-size:12px;padding:0;text-decoration:underline;cursor:pointer}
 .vnotes .t{font-size:15px;line-height:1.8;white-space:pre-wrap}
-.vwrite{align-self:flex-start;border:1px solid var(--gold);background:none;color:var(--ink);border-radius:999px;padding:7px 14px;font-size:14px;cursor:pointer;font-family:inherit}
+.vwrite{align-self:flex-start;border:1px solid var(--gold);background:rgba(180,138,53,.12);color:var(--ink);border-radius:999px;padding:8px 16px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit}
+.vwrite::before{content:"✎ ";color:var(--gold)}
+/* 還沒寫過感動的人，按鈕會一閃一閃，提醒這裡可以按；寫過一次之後就不再閃 */
+@media (prefers-reduced-motion:no-preference){
+  .vwrite.pulse{animation:vpulse 1.8s ease-in-out infinite}
+  @keyframes vpulse{
+    0%{box-shadow:0 0 0 0 rgba(180,138,53,.55);background:rgba(180,138,53,.12)}
+    50%{background:rgba(180,138,53,.32)}
+    70%{box-shadow:0 0 0 10px rgba(180,138,53,0)}
+    100%{box-shadow:0 0 0 0 rgba(180,138,53,0);background:rgba(180,138,53,.12)}
+  }
+}
 .vform[hidden]{display:none}
 .vform{display:flex;flex-direction:column;gap:8px}
 .vform textarea{width:100%;min-height:96px;resize:vertical;border:1px solid #cdd6cf;border-radius:10px;background:#fff;color:#1f2a2b;font-family:var(--font-body);font-size:16px;line-height:1.7;padding:10px}
@@ -1162,6 +1173,8 @@ $("vlist").addEventListener("click", e => {
     $("sDeep").textContent = nt.deep;
   }
   $("vnForm").hidden = true; $("vnOpen").hidden = false; $("vnText").value = ""; $("vnSave").disabled = true; $("vnStatus").textContent = "";
+  let wrote = false; try { wrote = localStorage.getItem("flag:vnwrote") === "1"; } catch(e){}
+  $("vnOpen").classList.toggle("pulse", !wrote);
   vnRender();
   $("sheet").querySelector(".sbox").scrollTop = 0;
   $("sCompare").href = `https://www.bible.com/zh-TW/bible/3283/PRO.${ch}.${v}.TCV2019T`;
@@ -1223,6 +1236,8 @@ $("vnSave").onclick = () => {
   if (!vnPut(ch,v,arr)){ $("vnStatus").textContent = "存不進去，請先把文字複製起來"; return; }
   $("vnText").value = ""; $("vnSave").disabled = true;
   $("vnForm").hidden = true; $("vnOpen").hidden = false;
+  try { localStorage.setItem("flag:vnwrote", "1"); } catch(e){}
+  $("vnOpen").classList.remove("pulse");
   vnRender(); markNoted(); loadJournal(); toast("已記下這節的感動");
 };
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("sheet").hidden) closeSheet(); });
