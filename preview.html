@@ -164,12 +164,16 @@ body.night .vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,
 /* ── 點經文跳出的選單 ── */
 .sheet{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.25)}
 .sheet[hidden]{display:none}
-.sbox{width:100%;max-width:560px;background:var(--paper);color:var(--ink);border-radius:18px 18px 0 0;padding:16px 20px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;box-shadow:0 -6px 24px rgba(0,0,0,.15)}
+.sbox{width:100%;max-width:560px;max-height:82vh;overflow-y:auto;background:var(--paper);color:var(--ink);border-radius:18px 18px 0 0;padding:16px 20px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;box-shadow:0 -6px 24px rgba(0,0,0,.15)}
 @media (prefers-reduced-motion:no-preference){ .sheet:not([hidden]) .sbox{animation:up .22s ease-out} @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}} }
 .srow{display:flex;align-items:center;justify-content:space-between}
 .srow b{font-size:15px}
 .sx{width:36px;height:36px;border-radius:50%;border:none;background:var(--bg);color:var(--ink);font-size:16px;cursor:pointer}
 .stext{margin:0;font-family:var(--font-display);font-size:16px;line-height:1.8;color:var(--muted)}
+.note{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border-radius:12px;background:var(--bg)}
+.note[hidden]{display:none}
+.note .nt{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.15em;margin-bottom:-6px}
+.note p{margin:0;font-size:15px;line-height:1.85;color:var(--ink)}
 .colors{display:flex;gap:12px;align-items:center}
 .cdot{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer}
 .cdot.on{border-color:var(--ink)}
@@ -283,6 +287,10 @@ body.night #p3 details{background:#192122}
   <div class="sbox" role="dialog" aria-labelledby="sRef">
     <div class="srow"><b id="sRef"></b><button class="sx" id="sClose" aria-label="關閉">✕</button></div>
     <p class="stext" id="sText"></p>
+    <div class="note" id="sNoteBox" hidden>
+      <div class="nt">白話</div><p id="sPlain"></p>
+      <div class="nt">細讀</div><p id="sDeep"></p>
+    </div>
     <div class="colors" id="colors">
       <button class="cdot y" data-c="y" aria-label="黃色標記"></button>
       <button class="cdot g" data-c="g" aria-label="綠色標記"></button>
@@ -713,6 +721,20 @@ const REFLECTS = {
   ]
 };
 
+// ── 每節註釋：白話＋細讀 ──
+const NOTES = {
+  "11": {
+    "28": {
+      "plain": "把安全感全押在錢上的人，很容易跌倒；活得正直的人，會像樹上的新葉，一直有生氣。",
+      "deep": "「倚仗」是把整個人靠上去。錢本身不是壞事，問題是把它當成唯一的靠山：景氣一變、東西一壞，人就跟著倒。下半句用「青葉」來對比，葉子會一直是綠的，不是因為它自己存了多少養分，而是因為它連在樹上，根一直在吸水。正直的人有生氣，也是因為他連著比錢更穩的東西：神、良心，還有身邊互相扶持的人。"
+    },
+    "30": {
+      "plain": "正直的人活出來的樣子，像一棵生命樹，讓身邊的人得到好處；有智慧的人，能贏得別人的心。",
+      "deep": "「生命樹」最早出現在創世記的伊甸園，是給人生命的樹。箴言好幾次借用這個畫面（3:18、13:12、15:4），這裡是說：一個人的好品格，不只讓自己過得好，也會讓靠近他的人得到力量。下半句的「得人」，是贏得人心，讓人願意靠近、願意跟隨，不是用手段拉攏。兩句合起來看：好的生命會結果子，而這些果子，最後是長在別人身上。"
+    }
+  }
+};
+
 // ── 短禱告：每章 12 句（求祢……），對應 1～12 月；開頭結尾依早安／午安／晚安變化 ──
 const PRAYERS = {
   "11": [
@@ -954,6 +976,10 @@ $("vlist").addEventListener("click", e => {
   const ch = cur.getDate(), v = +li.dataset.v;
   $("sRef").textContent = `箴言 ${ch}:${v}`;
   $("sText").textContent = TEXT[ch][v-1];
+  const nt = (NOTES[ch] || {})[v];
+  $("sNoteBox").hidden = !nt;
+  if (nt){ $("sPlain").textContent = nt.plain; $("sDeep").textContent = nt.deep; }
+  $("sheet").querySelector(".sbox").scrollTop = 0;
   $("sCompare").href = `https://www.bible.com/zh-TW/bible/3283/PRO.${ch}.${v}.TCV2019T`;
   const c = hlGet(ch,v);
   document.querySelectorAll(".cdot").forEach(d => d.classList.toggle("on", !!c && d.dataset.c === c));
