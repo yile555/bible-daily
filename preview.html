@@ -188,6 +188,25 @@ body.night .vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,
 body.night #p3 .card{background:var(--paper)}
 body.night .notes textarea{background:#27322f;border-color:#3a4746}
 body.night #p3 details{background:#192122}
+/* ── 每節筆記 ── */
+.vlist li.noted .n::after{content:"";position:absolute;left:0;top:1.7em;width:5px;height:5px;border-radius:50%;background:var(--gold)}
+.mine{display:flex;flex-direction:column;gap:8px}
+.mine .mt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.15em}
+.vnotes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.vnotes li{border-left:2px solid var(--gold);padding:2px 0 2px 10px}
+.vnotes .h{font-size:12px;color:var(--muted);display:flex;gap:10px;align-items:center}
+.vnotes .h button{border:none;background:none;color:var(--muted);font-size:12px;padding:0;text-decoration:underline;cursor:pointer}
+.vnotes .t{font-size:15px;line-height:1.8;white-space:pre-wrap}
+.vwrite{align-self:flex-start;border:1px solid var(--gold);background:none;color:var(--ink);border-radius:999px;padding:7px 14px;font-size:14px;cursor:pointer;font-family:inherit}
+.vform[hidden]{display:none}
+.vform{display:flex;flex-direction:column;gap:8px}
+.vform textarea{width:100%;min-height:96px;resize:vertical;border:1px solid #cdd6cf;border-radius:10px;background:#fff;color:#1f2a2b;font-family:var(--font-body);font-size:16px;line-height:1.7;padding:10px}
+body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4746}
+.vform .row{display:flex;justify-content:space-between;align-items:center}
+.chips{display:flex;gap:8px;margin:2px 0 12px}
+.chip{border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.journal .tag2{display:inline-block;font-size:11px;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0 6px;margin-left:2px}
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:14px;padding:9px 16px;border-radius:999px;z-index:30;opacity:0;transition:opacity .25s;pointer-events:none}
 .toast.show{opacity:1}
 </style>
@@ -254,7 +273,8 @@ body.night #p3 details{background:#192122}
   </section>
 
   <details>
-    <summary>我的心情故事紀錄</summary>
+    <summary>我的信仰點滴</summary>
+    <div class="chips"><button class="chip on" data-f="all">全部</button><button class="chip" data-f="ch" id="chipCh">只看這一章</button></div>
     <ul class="journal" id="journal"></ul>
   </details>
 
@@ -272,10 +292,12 @@ body.night #p3 details{background:#192122}
     <summary>怎麼用</summary>
     <p>箴言有 31 章，幾號就讀第幾章，一個月讀完一輪。</p>
     <p>經文一節一行，正在讀的那一節顏色比較深，往上滑就換下一節，不怕讀到一半找不到位置。讀到最後，按「心情故事」換到下一頁，再按「今日格言」，會一起出現今日禱告。同一章每個月會換一組，一年 12 組不重複。</p>
-    <p>點一下任何一節經文，可以用顏色標記、複製、對照其他版本，或直接寫進「屬於你的心情故事」。標記會留在這台裝置上，下個月讀到同一章還看得到。</p>
+    <p>點一下任何一節經文，可以看這節的註釋、寫下感動、用顏色標記、複製，或對照其他版本。標記會留在這台裝置上，下個月讀到同一章還看得到。</p>
     <p>故事最後的「默想」，是留給你的一個小問題。想到什麼，可以寫進下面的「屬於你的心情故事」，沒有標準答案，想不到也沒關係。</p>
     <p>故事上方的兩個字，是聖靈的九種果子之一：仁愛、喜樂、和平、忍耐、恩慈、良善、信實、溫柔、節制。</p>
-    <p>「屬於你的心情故事」按「儲存」後，會存在你現在用的這支手機或這台電腦上，只有你自己看得到，在「我的心情故事紀錄」可以回顧。換一台裝置，或清除瀏覽器資料，之前的紀錄就看不到了。</p>
+    <p>讀經時點一下經文，可以「寫下這節的感動」，會自動記下日期。寫過的經節旁邊有一個小金點，以後再讀到這一節，點開就看得到以前寫的。</p>
+    <p>「我的信仰點滴」會把每節的感動和每天的心情故事，照日期排在一起，也可以只看某一章。</p>
+    <p>這些紀錄都存在你現在用的這支手機或這台電腦上，只有你自己看得到。換一台裝置，或清除瀏覽器資料，之前的紀錄就看不到了。</p>
     <p>經文最後的「參考其他版本」會打開 bible.com，先顯示現代中文譯本 2019 版，在那裡也能切換成其他譯本。讀完切回這裡繼續。</p>
     <p>依打開的時間自動切換：早安 5:00～10:59、午安 11:00～17:59、晚安 18:00 以後（畫面變深色）。禱告的開頭和祝福會跟著時段變化。</p>
     <p>進度表裡有金點的日期，代表那一章的格言已經寫好。</p>
@@ -288,6 +310,15 @@ body.night #p3 details{background:#192122}
   <div class="sbox" role="dialog" aria-labelledby="sRef">
     <div class="srow"><b id="sRef"></b><button class="sx" id="sClose" aria-label="關閉">✕</button></div>
     <p class="stext" id="sText"></p>
+    <div class="mine" id="mine">
+      <div class="mt" id="vnTitle">我的感動</div>
+      <ul class="vnotes" id="vnList"></ul>
+      <button class="vwrite" id="vnOpen">寫下這節的感動</button>
+      <div class="vform" id="vnForm" hidden>
+        <textarea id="vnText" placeholder="這一節讓你想到什麼？會自動記下今天的日期。"></textarea>
+        <div class="row"><span class="status" id="vnStatus"></span><button class="save" id="vnSave" disabled>儲存</button></div>
+      </div>
+    </div>
     <div class="note" id="sNoteBox" hidden>
       <div class="nt">白話</div><p id="sPlain"></p>
       <div class="nt">原文</div><p id="sOrig"></p>
@@ -302,7 +333,6 @@ body.night #p3 details{background:#192122}
     </div>
     <button class="sact" id="sCopy">複製這節經文</button>
     <a class="sact" id="sCompare" href="#" target="_blank" rel="noopener">對照其他版本 ›</a>
-    <button class="sact" id="sNote">寫進我的心情故事</button>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -985,6 +1015,7 @@ function render(){
     $("vlist").innerHTML = `<li class="active"><span class="n"></span><span class="vt">這一章的經文還沒放進來，可以先按下面的「參考其他版本」到網路上讀。</span></li>`;
   }
 
+  if (verses) markNoted();
   $("tcvLink").href = `https://www.bible.com/zh-TW/bible/3283/PRO.${day}.TCV2019T`;
   $("tcvLink").textContent = "參考其他版本 ›";
 
@@ -1133,6 +1164,8 @@ $("vlist").addEventListener("click", e => {
     $("sOrig").innerHTML = esc(nt.orig).replace(/[\u0590-\u05FF][\u0590-\u05FF\s]*[\u0590-\u05FF]|[\u0590-\u05FF]/g, m => `<bdi dir="rtl" lang="he" class="he">${m}</bdi>`);
     $("sDeep").textContent = nt.deep;
   }
+  $("vnForm").hidden = true; $("vnOpen").hidden = false; $("vnText").value = ""; $("vnSave").disabled = true; $("vnStatus").textContent = "";
+  vnRender();
   $("sheet").querySelector(".sbox").scrollTop = 0;
   $("sCompare").href = `https://www.bible.com/zh-TW/bible/3283/PRO.${ch}.${v}.TCV2019T`;
   const c = hlGet(ch,v);
@@ -1159,12 +1192,41 @@ $("sCopy").onclick = async () => {
   catch(e){ const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch(_){} ta.remove(); }
   closeSheet(); toast("已複製");
 };
-$("sNote").onclick = () => {
+// ── 每節筆記：寫下這節的感動，自動記日期，存在這台裝置 ──
+const vnKey = (ch,v) => `vn:${ch}:${v}`;
+function vnGet(ch,v){ try { return JSON.parse(localStorage.getItem(vnKey(ch,v))) || []; } catch(e){ return []; } }
+function vnPut(ch,v,arr){ try { arr.length ? localStorage.setItem(vnKey(ch,v), JSON.stringify(arr)) : localStorage.removeItem(vnKey(ch,v)); return true; } catch(e){ return false; } }
+function vnAll(){
+  const out = [];
+  try { for (let i=0;i<localStorage.length;i++){ const k = localStorage.key(i); if (!k.startsWith("vn:")) continue;
+    const [,ch,v] = k.split(":"); (JSON.parse(localStorage.getItem(k))||[]).forEach(n => out.push({...n, ch:+ch, v:+v})); } } catch(e){}
+  return out;
+}
+const fmtDate = d => { const [y,m,dd] = d.split("-"); return `${y}/${+m}/${+dd}`; };
+function vnRender(){
+  const ch = cur.getDate(), v = +picked.dataset.v, list = vnGet(ch,v);
+  $("vnTitle").textContent = list.length ? `我的感動（${list.length}）` : "我的感動";
+  $("vnList").innerHTML = list.slice().reverse().map(n => `<li><div class="h">${fmtDate(n.date)}<button data-ts="${n.ts}">刪除</button></div><div class="t">${esc(n.text)}</div></li>`).join("");
+  $("vnList").querySelectorAll("button[data-ts]").forEach(b => b.onclick = () => {
+    if (!confirm("確定要刪除這則感動嗎？刪除後就找不回來了。")) return;
+    vnPut(ch, v, vnGet(ch,v).filter(n => String(n.ts) !== b.dataset.ts));
+    vnRender(); markNoted(); loadJournal();
+  });
+}
+function markNoted(){
+  const ch = cur.getDate();
+  document.querySelectorAll("#vlist li[data-v]").forEach(li => li.classList.toggle("noted", vnGet(ch, +li.dataset.v).length > 0));
+}
+$("vnOpen").onclick = () => { $("vnOpen").hidden = true; $("vnForm").hidden = false; $("vnText").focus(); };
+$("vnText").addEventListener("input", () => { $("vnSave").disabled = !$("vnText").value.trim(); $("vnStatus").textContent = ""; });
+$("vnSave").onclick = () => {
+  const text = $("vnText").value.trim(); if (!text || !picked) return;
   const ch = cur.getDate(), v = +picked.dataset.v;
-  const line = `箴言 ${ch}:${v}「${TEXT[ch][v-1]}」\n`;
-  note.value = note.value ? note.value.replace(/\s*$/, "\n") + line : line;
-  note.dispatchEvent(new Event("input"));
-  closeSheet(); toast("已放進最後一頁的心情故事");
+  const arr = vnGet(ch,v); arr.push({ date: key(new Date()), text, ts: Date.now() });
+  if (!vnPut(ch,v,arr)){ $("vnStatus").textContent = "存不進去，請先把文字複製起來"; return; }
+  $("vnText").value = ""; $("vnSave").disabled = true;
+  $("vnForm").hidden = true; $("vnOpen").hidden = false;
+  vnRender(); markNoted(); loadJournal(); toast("已記下這節的感動");
 };
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("sheet").hidden) closeSheet(); });
 
@@ -1240,18 +1302,29 @@ saveBtn.onclick = async () => {
   saveBtn.disabled = note.value === loadedText;
 };
 
+let jFilter = "all";
+document.querySelectorAll(".chip").forEach(c => c.onclick = () => {
+  jFilter = c.dataset.f;
+  document.querySelectorAll(".chip").forEach(x => x.classList.toggle("on", x === c));
+  loadJournal();
+});
 async function loadJournal(){
   const ul = $("journal");
-  if (!store){ ul.innerHTML = `<li class="h">載入中…</li>`; return; }
-  try {
-    const items = (await store.all()).filter(o => o && o.text && o.text.trim());
-    if (!items.length){ ul.innerHTML = `<li><div class="h">還沒有寫過心情故事。</div></li>`; return; }
-    ul.innerHTML = items.map(o => {
-      const [y,mo,d] = o.date.split("-").map(Number);
-      return `<li><div class="h">${mo} 月 ${d} 日 · 箴言 ${o.chapter} 章 · <button data-d="${o.date}">打開這天</button></div><div class="t">${esc(o.text)}</div></li>`;
-    }).join("");
-    ul.querySelectorAll("button[data-d]").forEach(b => b.onclick = () => { const [y,mo,d] = b.dataset.d.split("-").map(Number); go(new Date(y,mo-1,d)); });
-  } catch(e){ ul.innerHTML = `<li><div class="h">紀錄暫時讀不到。</div></li>`; }
+  $("chipCh").textContent = `只看第 ${cur.getDate()} 章`;
+  let days = [];
+  try { if (store) days = (await store.all()).filter(o => o && o.text && o.text.trim()); } catch(e){}
+  let items = [
+    ...days.map(o => ({ kind:"day", date:o.date, ch:o.chapter, text:o.text, ts: Date.parse(o.updatedAt||o.date) || 0 })),
+    ...vnAll().map(n => ({ kind:"verse", date:n.date, ch:n.ch, v:n.v, text:n.text, ts:n.ts }))
+  ];
+  if (jFilter === "ch") items = items.filter(o => o.ch === cur.getDate());
+  items.sort((a,b) => a.date === b.date ? b.ts - a.ts : (a.date < b.date ? 1 : -1));
+  if (!items.length){ ul.innerHTML = `<li><div class="h">${jFilter === "ch" ? "這一章還沒有寫過。" : "還沒有寫過。讀經時點一下經文，或在上面寫下今天的心情故事，都會出現在這裡。"}</div></li>`; return; }
+  ul.innerHTML = items.map(o => {
+    const where = o.kind === "verse" ? `箴言 ${o.ch}:${o.v}` : `箴言 ${o.ch} 章 <span class="tag2">心情故事</span>`;
+    return `<li><div class="h">${fmtDate(o.date)} · ${where} · <button data-d="${o.date}">打開這天</button></div><div class="t">${esc(o.text)}</div></li>`;
+  }).join("");
+  ul.querySelectorAll("button[data-d]").forEach(b => b.onclick = () => { const [y,mo,d] = b.dataset.d.split("-").map(Number); go(new Date(y,mo-1,d)); });
 }
 
 render();
