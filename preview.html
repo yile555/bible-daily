@@ -207,7 +207,11 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
 .chip{border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer}
 .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .journal .tag2{display:inline-block;font-size:11px;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0 6px;margin-left:2px}
-.story .tag .src{margin-left:auto;font-size:12px;color:var(--gold)}
+.srcbox{position:sticky;top:0;z-index:2;margin:-24px -22px 0;padding:14px 22px 12px;background:var(--paper);border-bottom:1px solid var(--line);border-radius:14px 14px 0 0;font-size:15px;line-height:1.8}
+.srcbox .sl{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.15em;margin-right:8px}
+.srcbox .sref{font-weight:700;color:var(--accent);margin-right:6px}
+.srcbox .stx{font-family:var(--font-display);color:var(--ink)}
+.story #storyText{white-space:pre-line}
 .vlist li.storyv .n{color:#fff;background:var(--gold);border-radius:4px;padding:0 3px;margin-left:-3px}
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:14px;padding:9px 16px;border-radius:999px;z-index:30;opacity:0;transition:opacity .25s;pointer-events:none}
 .toast.show{opacity:1}
@@ -244,7 +248,8 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
   <section class="page" id="p2" hidden>
     <button class="back" data-go="1">‹ 回到經文</button>
     <article class="story" id="story">
-      <div class="tag"><span id="storyLabel">今日心情故事</span><span class="fruit" id="fruit"></span><span class="src" id="storySrc"></span></div>
+      <div class="srcbox" id="srcBox"><span class="sl">出處</span><span class="sref" id="storySrc"></span><span class="stx" id="storyVerse"></span></div>
+      <div class="tag"><span id="storyLabel">今日心情故事</span><span class="fruit" id="fruit"></span></div>
       <p id="storyText"></p>
       <div class="reflect" id="reflect" hidden><span class="rt">默想</span><p id="reflectText"></p></div>
     </article>
@@ -1013,7 +1018,8 @@ function render(){
   $("storyText").textContent = st ? st.story : `第 ${day} 章第 ${sv} 節的心情故事還在準備中。`;
   $("fruit").textContent = st ? st.fruit : "";
   $("fruit").hidden = !st;
-  $("storySrc").textContent = `出自 ${day}:${sv}`;
+  $("storySrc").textContent = `${day}:${sv}`;
+  $("storyVerse").textContent = verses ? verses[sv-1] : "";
   const rf = st ? st.reflect : "";
   reflectBase = rf;
   $("reflectText").textContent = rf;
