@@ -211,7 +211,8 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
 .srcbox .sl{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.15em;margin-right:8px}
 .srcbox .sref{font-weight:700;color:var(--accent);margin-right:6px}
 .srcbox .stx{font-family:var(--font-display);color:var(--ink)}
-.story #storyText{white-space:pre-line}
+.story #storyText .para{display:block}
+.story #storyText .para + .para{margin-top:.7em}
 .vlist li.storyv .n{color:#fff;background:var(--gold);border-radius:4px;padding:0 3px;margin-left:-3px}
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:14px;padding:9px 16px;border-radius:999px;z-index:30;opacity:0;transition:opacity .25s;pointer-events:none}
 .toast.show{opacity:1}
@@ -1015,7 +1016,7 @@ function render(){
   $("tcvLink").textContent = "參考其他版本 ›";
 
   const st = setFor(cur);
-  $("storyText").textContent = st ? st.story : `第 ${day} 章第 ${sv} 節的心情故事還在準備中。`;
+  $("storyText").innerHTML = st ? st.story.split(/\n\s*\n/).map(x=>`<span class="para">${esc(x.trim())}</span>`).join("") : `第 ${day} 章第 ${sv} 節的心情故事還在準備中。`;
   $("fruit").textContent = st ? st.fruit : "";
   $("fruit").hidden = !st;
   $("storySrc").textContent = `${day}:${sv}`;
