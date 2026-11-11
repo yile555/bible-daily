@@ -167,9 +167,9 @@ body.night .vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,
 .sbox{width:100%;max-width:560px;max-height:82vh;overflow-y:auto;background:var(--paper);color:var(--ink);border-radius:18px 18px 0 0;padding:16px 20px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;box-shadow:0 -6px 24px rgba(0,0,0,.15)}
 @media (prefers-reduced-motion:no-preference){ .sheet:not([hidden]) .sbox{animation:up .22s ease-out} @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}} }
 .srow{display:flex;align-items:center;justify-content:space-between}
-.srow b{font-size:15px}
+.srow b{font-size:17px}
 .sx{width:36px;height:36px;border-radius:50%;border:none;background:var(--bg);color:var(--ink);font-size:16px;cursor:pointer}
-.stext{margin:0;font-family:var(--font-display);font-size:16px;line-height:1.8;color:var(--muted)}
+.stext{margin:0;font-family:var(--font-body);font-weight:700;font-size:15px;line-height:1.8;color:var(--ink)}
 .note{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border-radius:12px;background:var(--bg)}
 .note[hidden]{display:none}
 .note .nt{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.15em;margin-bottom:-6px}
@@ -315,7 +315,7 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
       <ul class="vnotes" id="vnList"></ul>
       <button class="vwrite" id="vnOpen">寫下這節的感動</button>
       <div class="vform" id="vnForm" hidden>
-        <textarea id="vnText" placeholder="這一節讓你想到什麼？會自動記下今天的日期。"></textarea>
+        <textarea id="vnText" placeholder="您的感動會自動被記錄起來。"></textarea>
         <div class="row"><span class="status" id="vnStatus"></span><button class="save" id="vnSave" disabled>儲存</button></div>
       </div>
     </div>
