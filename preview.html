@@ -155,7 +155,7 @@ body.night .vt.hl-y{background:linear-gradient(transparent 52%,rgba(245,214,90,.
 body.night .vt.hl-g{background:linear-gradient(transparent 52%,rgba(130,214,150,.32) 52%)}
 body.night .vt.hl-b{background:linear-gradient(transparent 52%,rgba(120,200,240,.32) 52%)}
 body.night .vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,.32) 52%)}
-.endbox{padding:16px 22px 8px;display:flex;flex-direction:column;gap:12px}
+.endbox{padding:56px 22px 8px;display:flex;flex-direction:column;gap:12px}
 .endbox .done{font-size:13px;color:var(--muted);text-align:center;letter-spacing:.2em}
 .endbox .tcv{margin:0 auto}
 .hint{margin:-8px 0 0;text-align:center;font-size:12px;color:var(--muted);transition:opacity .4s}
@@ -176,6 +176,13 @@ body.night .vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,
 .cdot.y{background:#f5d65a}.cdot.g{background:#82d696}.cdot.b{background:#78c8f0}.cdot.p{background:#f2a0c3}
 .cdot.x{background:var(--bg);color:var(--muted);font-size:12px;width:auto;padding:0 12px;border-radius:999px;border-color:var(--line)}
 .sact{display:block;width:100%;text-align:left;border:none;border-top:1px solid var(--line);background:none;color:var(--ink);font-size:16px;padding:13px 2px;cursor:pointer;text-decoration:none;font-family:inherit}
+/* ── 格言頁：心得輸入框白色，其他區塊用不同底色區分 ── */
+#p3 .card{background:#f6efdf}
+.notes textarea{background:#fff;border-color:#cdd6cf;box-shadow:0 1px 3px rgba(31,42,43,.06)}
+#p3 details{background:#dce4de;border-color:transparent}
+body.night #p3 .card{background:var(--paper)}
+body.night .notes textarea{background:#27322f;border-color:#3a4746}
+body.night #p3 details{background:#192122}
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:14px;padding:9px 16px;border-radius:999px;z-index:30;opacity:0;transition:opacity .25s;pointer-events:none}
 .toast.show{opacity:1}
 </style>
