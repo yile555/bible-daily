@@ -98,9 +98,9 @@ body.night .fruit{color:#10201d}
 details{background:var(--paper);border-radius:10px;padding:4px 16px;border:1px solid var(--line)}
 summary{cursor:pointer;padding:10px 0;font-size:calc(14px * var(--fs,1));font-weight:500;color:var(--muted)}
 .dots{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px}
-.dot{aspect-ratio:1;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font-size:calc(13px * var(--fs,1));font-variant-numeric:tabular-nums;cursor:pointer;position:relative;padding:0}
+.dot{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font-size:calc(13px * var(--fs,1));font-variant-numeric:tabular-nums;cursor:pointer;position:relative;padding:0}
 .dot.done{background:#d5e6dd;border-color:#b9d3c6;color:var(--accent);font-weight:600}
-.dot.done::after{content:"✓";position:absolute;bottom:1px;left:0;right:0;font-size:calc(10px * var(--fs,1));line-height:1;color:var(--accent)}
+.dot.done::after{content:"✓";font-size:calc(12px * var(--fs,1));line-height:1;margin-top:3px;color:var(--accent)}
 .dot.later{opacity:.45}
 .dot.sel.later{opacity:1;color:var(--muted)}
 .dot.sel{box-shadow:inset 0 0 0 2px var(--accent)}
@@ -112,7 +112,7 @@ summary{cursor:pointer;padding:10px 0;font-size:calc(14px * var(--fs,1));font-we
 .tips dd{margin:0;color:var(--ink)}
 .tips .ic{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;border-radius:5px;font-size:calc(12px * var(--fs,1));font-weight:700}
 .tips .ic.gold{background:var(--gold);color:#fff;padding:0 4px}
-.tips .ic.dotg{min-width:8px;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-left:8px}
+.tips dt .ic.pen{min-width:0;width:calc(20px * var(--fs,1));height:calc(20px * var(--fs,1));margin-left:2px}
 .tips .ic.fr{background:var(--accent);color:#fff;border-radius:999px;padding:0 9px}
 body.night .tips .ic.fr{color:#10201d}
 .tips .ic.ok{background:#d5e6dd;color:var(--accent);border:1px solid #b9d3c6}
@@ -220,7 +220,8 @@ body.night #p3 .card{background:var(--paper)}
 body.night .notes textarea{background:#27322f;border-color:#3a4746}
 body.night #p3 details{background:#192122}
 /* ── 每節筆記 ── */
-.vlist li.noted .n::after{content:"";position:absolute;left:0;top:1.7em;width:5px;height:5px;border-radius:50%;background:var(--gold)}
+/* 寫過筆記的經節：經文最後面加一支小筆 */
+.vlist li.noted .vt::after,.tips .ic.pen{content:"";display:inline-block;width:.8em;height:.8em;margin-left:.35em;vertical-align:-.02em;background:var(--gold);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z'/%3E%3Cpath d='M13.5 6.5l4 4'/%3E%3C/svg%3E") no-repeat center/contain;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z'/%3E%3Cpath d='M13.5 6.5l4 4'/%3E%3C/svg%3E") no-repeat center/contain}
 .mine{display:flex;flex-direction:column;gap:8px}
 .mine .mt{font-size:calc(13px * var(--fs,1));font-weight:700;color:var(--gold);letter-spacing:.15em}
 .vnotes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
@@ -296,8 +297,8 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
       <summary>使用說明</summary>
       <p class="tipline">每一節經文都可以點選，裡面有註釋、筆記、標記重點。</p>
       <dl class="tips">
-        <dt><span class="ic gold">12</span></dt><dd>今天恩典小品的出處</dd>
-        <dt><span class="ic dotg"></span></dt><dd>寫過筆記的經節</dd>
+        <dt><span class="ic gold" id="helpSv">1</span></dt><dd>今天的恩典小品出自這一節</dd>
+        <dt><span class="ic pen"></span></dt><dd>這一節寫過筆記</dd>
         <dt><span class="ic ok">✓</span></dt><dd>讀完自動打勾</dd>
       </dl>
     </details>
@@ -1663,6 +1664,7 @@ function render(){
   const sv = svNow();
   const svLi = $("vlist").querySelector(`li[data-ch="${day}"][data-v="${sv}"]`);
   if (svLi) svLi.classList.add("storyv");
+  $("helpSv").textContent = vLabel(day, sv);
   $("tcvLink").href = `https://www.bible.com/zh-TW/bible/3283/PRO.${day}.TCV2019T`;
   $("tcvLink").textContent = "參考其他版本 ›";
 
