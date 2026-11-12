@@ -106,6 +106,7 @@ summary{cursor:pointer;padding:10px 0;font-size:calc(14px * var(--fs,1));font-we
 .dot.sel{box-shadow:inset 0 0 0 2px var(--accent)}
 .dot:disabled{opacity:.25;cursor:default}
 .plan{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 14px 4px}
+.tipline{margin:6px 0 10px;font-size:calc(16px * var(--fs,1));line-height:1.7}
 .tips{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;margin:4px 0 14px;font-size:calc(16px * var(--fs,1));line-height:1.6}
 .tips dt{font-weight:600;color:var(--accent);white-space:nowrap}
 .tips dd{margin:0;color:var(--ink)}
@@ -293,17 +294,11 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
     </div>
     <details class="help">
       <summary>使用說明</summary>
+      <p class="tipline">每一節經文都可以點選，裡面有註釋、筆記、標記重點。</p>
       <dl class="tips">
-        <dt>點經文</dt><dd>看註釋、寫感動、畫重點</dd>
         <dt><span class="ic gold">12</span></dt><dd>今天恩典小品的出處</dd>
-        <dt><span class="ic dotg"></span></dt><dd>寫過感動的經節</dd>
+        <dt><span class="ic dotg"></span></dt><dd>寫過筆記的經節</dd>
         <dt><span class="ic ok">✓</span></dt><dd>讀完自動打勾</dd>
-        <dt><span class="ic fr">溫柔</span></dt><dd>聖靈的果子</dd>
-        <dt>依日期</dt><dd>幾號讀第幾章</dd>
-        <dt>依進度</dt><dd>讀完一章接下一章</dd>
-        <dt>月底補讀</dt><dd>短的月份，月底多讀幾節</dd>
-        <dt>默想</dt><dd>留給你的小問題</dd>
-        <dt>紀錄</dt><dd>存在這支手機，換手機會不見</dd>
       </dl>
     </details>
   </section>
