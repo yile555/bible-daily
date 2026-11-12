@@ -31,9 +31,9 @@ button:focus-visible,a:focus-visible,textarea:focus-visible,summary:focus-visibl
 .greet{text-align:center;font-family:var(--font-display);font-size:15px;letter-spacing:.3em;color:var(--accent);margin-bottom:-6px}
 .prayer{background:transparent;border:1px dashed var(--gold);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
 .prayer[hidden]{display:none}
-.prayer .ptitle{font-size:13px;color:var(--muted);letter-spacing:.1em}
-.prayer p{font-family:var(--font-display);font-size:17px;line-height:1.9;margin:0}
-.prayer .bless{font-size:14px;color:var(--accent);font-weight:500;padding-top:6px;border-top:1px solid var(--line)}
+.prayer .ptitle{font-size:14px;color:var(--muted);letter-spacing:.1em}
+.prayer p{font-family:var(--font-display);font-size:19px;line-height:1.95;margin:0}
+.prayer .bless{font-size:16px;color:var(--accent);font-weight:500;padding-top:6px;border-top:1px solid var(--line)}
 @media (prefers-reduced-motion:no-preference){ .prayer.show{animation:rise .6s ease-out} }
 body.night{
   --bg:#141b1c; --paper:#1d2627; --ink:#e6ebe7; --muted:#9aa6a1; --accent:#7fc0b3; --gold:#c9a55a; --line:#2f3a3b;
@@ -65,13 +65,13 @@ body.night .fruit{color:#10201d}
 
 .story{background:var(--paper);border-radius:14px;padding:24px 22px 20px;border:1px solid var(--line);display:flex;flex-direction:column;gap:14px}
 .story[hidden]{display:none}
-.story .tag{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.story .tag{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
 .story .fruit{background:var(--accent);color:#fff;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700}
-.story p{font-family:var(--font-display);font-size:18px;line-height:1.95;margin:0}
+.story p{font-family:var(--font-display);font-size:20px;line-height:1.95;margin:0}
 .story .reflect{border-top:1px dashed var(--gold);padding-top:12px;display:flex;flex-direction:column;gap:4px}
 .story .reflect[hidden]{display:none}
-.story .reflect .rt{font-size:12px;color:var(--gold);letter-spacing:.25em;font-weight:700}
-.story .reflect p{font-family:var(--font-body);font-size:15px;line-height:1.85;color:var(--muted);margin:0}
+.story .reflect .rt{font-size:13px;color:var(--gold);letter-spacing:.25em;font-weight:700}
+.story .reflect p{font-family:var(--font-body);font-size:17px;line-height:1.9;color:var(--muted);margin:0}
 .reveal.second{background:var(--paper);color:var(--accent);border:2px solid var(--accent)}
 @media (prefers-reduced-motion:no-preference){ .story.show{animation:rise .5s ease-out} }
 .card{background:var(--paper);border-radius:14px;padding:32px 26px 22px;box-shadow:0 1px 2px rgba(31,42,43,.06),0 8px 24px rgba(31,42,43,.10);position:relative;display:flex;flex-direction:column;gap:20px}
@@ -89,7 +89,7 @@ body.night .fruit{color:#10201d}
 
 .notes{display:flex;flex-direction:column;gap:8px}
 .notes label{font-weight:700;font-size:15px}
-.notes textarea{width:100%;min-height:130px;resize:vertical;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.7;padding:12px}
+.notes textarea{width:100%;min-height:130px;resize:vertical;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.7;padding:12px}
 .notes .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .notes .status{font-size:13px;color:var(--muted)}
 .save{border:1px solid var(--accent);background:var(--paper);color:var(--accent);font-weight:700;border-radius:10px;padding:9px 18px;cursor:pointer;font-size:15px}
@@ -106,8 +106,8 @@ summary{cursor:pointer;padding:10px 0;font-size:14px;font-weight:500;color:var(-
 .dot.sel{box-shadow:inset 0 0 0 2px var(--accent)}
 .dot:disabled{opacity:.25;cursor:default}
 .plan{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 14px 4px}
-.help h4{margin:14px 0 4px;font-size:14px;color:var(--accent)}
-.help p{font-size:14px;line-height:1.75;margin:0 0 6px}
+.help h4{margin:14px 0 4px;font-size:16px;color:var(--accent)}
+.help p{font-size:16px;line-height:1.8;margin:0 0 6px}
 .help{margin-bottom:8px}
 .plan .ph{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;font-size:14px;color:var(--muted)}
 .plan .ph b{font-weight:600;color:var(--ink)}
@@ -125,8 +125,8 @@ body.night .modesw button.on{color:#10201d}
 .list li.now{color:var(--accent);font-weight:700}
 .journal{margin:0 0 12px;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
 .journal li{border-left:2px solid var(--gold);padding-left:10px}
-.journal .h{font-size:12px;color:var(--muted)}
-.journal .t{font-size:15px;white-space:pre-wrap}
+.journal .h{font-size:13px;color:var(--muted)}
+.journal .t{font-size:17px;white-space:pre-wrap}
 .journal button{border:none;background:none;color:var(--accent);padding:0;font-size:12px;cursor:pointer;text-decoration:underline}
 details p{font-size:14px;color:var(--muted);margin:0 0 12px}
 
@@ -189,20 +189,20 @@ body.night .vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,
 .sbox{width:100%;max-width:560px;max-height:82vh;overflow-y:auto;background:var(--paper);color:var(--ink);border-radius:18px 18px 0 0;padding:16px 20px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;box-shadow:0 -6px 24px rgba(0,0,0,.15)}
 @media (prefers-reduced-motion:no-preference){ .sheet:not([hidden]) .sbox{animation:up .22s ease-out} @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}} }
 .srow{display:flex;align-items:center;justify-content:space-between}
-.srow b{font-size:17px}
+.srow b{font-size:19px}
 .sx{width:36px;height:36px;border-radius:50%;border:none;background:var(--bg);color:var(--ink);font-size:16px;cursor:pointer}
-.stext{margin:0;font-family:var(--font-body);font-weight:700;font-size:15px;line-height:1.8;color:var(--ink)}
+.stext{margin:0;font-family:var(--font-display);font-size:19px;line-height:1.85;color:var(--ink)}
 .note{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border-radius:12px;background:var(--bg)}
 .note[hidden]{display:none}
-.note .nt{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.15em;margin-bottom:-6px}
-.note p{margin:0;font-size:15px;line-height:1.85;color:var(--ink)}
-.note .he{font-family:'Noto Serif Hebrew','SBL Hebrew','Times New Roman',serif;font-size:17px;color:var(--accent)}
+.note .nt{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.15em;margin-bottom:-6px}
+.note p{margin:0;font-size:17px;line-height:1.9;color:var(--ink)}
+.note .he{font-family:'Noto Serif Hebrew','SBL Hebrew','Times New Roman',serif;font-size:19px;color:var(--accent)}
 .colors{display:flex;gap:12px;align-items:center}
 .cdot{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer}
 .cdot.on{border-color:var(--ink)}
 .cdot.y{background:#f5d65a}.cdot.g{background:#82d696}.cdot.b{background:#78c8f0}.cdot.p{background:#f2a0c3}
 .cdot.x{background:var(--bg);color:var(--muted);font-size:12px;width:auto;padding:0 12px;border-radius:999px;border-color:var(--line)}
-.sact{display:block;width:100%;text-align:left;border:none;border-top:1px solid var(--line);background:none;color:var(--ink);font-size:16px;padding:13px 2px;cursor:pointer;text-decoration:none;font-family:inherit}
+.sact{display:block;width:100%;text-align:left;border:none;border-top:1px solid var(--line);background:none;color:var(--ink);font-size:17px;padding:14px 2px;cursor:pointer;text-decoration:none;font-family:inherit}
 /* ── 格言頁：心得輸入框白色，其他區塊用不同底色區分 ── */
 #p3 .card{background:#f6efdf}
 .notes textarea{background:#fff;border-color:#cdd6cf;box-shadow:0 1px 3px rgba(31,42,43,.06)}
@@ -213,13 +213,13 @@ body.night #p3 details{background:#192122}
 /* ── 每節筆記 ── */
 .vlist li.noted .n::after{content:"";position:absolute;left:0;top:1.7em;width:5px;height:5px;border-radius:50%;background:var(--gold)}
 .mine{display:flex;flex-direction:column;gap:8px}
-.mine .mt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.15em}
+.mine .mt{font-size:13px;font-weight:700;color:var(--gold);letter-spacing:.15em}
 .vnotes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
 .vnotes li{border-left:2px solid var(--gold);padding:2px 0 2px 10px}
-.vnotes .h{font-size:12px;color:var(--muted);display:flex;gap:10px;align-items:center}
+.vnotes .h{font-size:13px;color:var(--muted);display:flex;gap:10px;align-items:center}
 .vnotes .h button{border:none;background:none;color:var(--muted);font-size:12px;padding:0;text-decoration:underline;cursor:pointer}
-.vnotes .t{font-size:15px;line-height:1.8;white-space:pre-wrap}
-.vwrite{align-self:flex-start;border:1px solid var(--gold);background:rgba(180,138,53,.12);color:var(--ink);border-radius:999px;padding:8px 16px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit}
+.vnotes .t{font-size:17px;line-height:1.85;white-space:pre-wrap}
+.vwrite{align-self:flex-start;border:1px solid var(--gold);background:rgba(180,138,53,.12);color:var(--ink);border-radius:999px;padding:9px 18px;font-size:17px;font-weight:500;cursor:pointer;font-family:inherit}
 .vwrite::before{content:"✎ ";color:var(--gold)}
 /* 還沒寫過感動的人，按鈕會一閃一閃，提醒這裡可以按；寫過一次之後就不再閃 */
 @media (prefers-reduced-motion:no-preference){
@@ -233,15 +233,15 @@ body.night #p3 details{background:#192122}
 }
 .vform[hidden]{display:none}
 .vform{display:flex;flex-direction:column;gap:8px}
-.vform textarea{width:100%;min-height:96px;resize:vertical;border:1px solid #cdd6cf;border-radius:10px;background:#fff;color:#1f2a2b;font-family:var(--font-body);font-size:16px;line-height:1.7;padding:10px}
+.vform textarea{width:100%;min-height:96px;resize:vertical;border:1px solid #cdd6cf;border-radius:10px;background:#fff;color:#1f2a2b;font-family:var(--font-body);font-size:17px;line-height:1.7;padding:10px}
 body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4746}
 .vform .row{display:flex;justify-content:space-between;align-items:center}
 .chips{display:flex;gap:8px;margin:2px 0 12px}
 .chip{border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer}
 .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .journal .tag2{display:inline-block;font-size:11px;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0 6px;margin-left:2px}
-.srcbox{position:sticky;top:0;z-index:2;margin:-24px -22px 0;padding:14px 22px 12px;background:var(--paper);border-bottom:1px solid var(--line);border-radius:14px 14px 0 0;font-size:15px;line-height:1.8}
-.srcbox .sl{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.15em;margin-right:8px}
+.srcbox{position:sticky;top:0;z-index:2;margin:-24px -22px 0;padding:14px 22px 12px;background:var(--paper);border-bottom:1px solid var(--line);border-radius:14px 14px 0 0;font-size:17px;line-height:1.8}
+.srcbox .sl{font-size:13px;font-weight:700;color:var(--gold);letter-spacing:.15em;margin-right:8px}
 .srcbox .sref{font-weight:700;color:var(--accent);margin-right:6px}
 .srcbox .stx{font-family:var(--font-display);color:var(--ink)}
 .story #storyText .para{display:block}
