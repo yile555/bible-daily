@@ -102,6 +102,7 @@ summary{cursor:pointer;padding:10px 0;font-size:14px;font-weight:500;color:var(-
 .dot.done{background:#d5e6dd;border-color:#b9d3c6;color:var(--accent);font-weight:600}
 .dot.done::after{content:"✓";position:absolute;bottom:1px;left:0;right:0;font-size:10px;line-height:1;color:var(--accent)}
 .dot.later{opacity:.45}
+.dot.sel.later{opacity:1;color:var(--muted)}
 .dot.sel{box-shadow:inset 0 0 0 2px var(--accent)}
 .dot:disabled{opacity:.25;cursor:default}
 .plan{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 14px 4px;margin-top:28px}
@@ -299,6 +300,8 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
     </div>
   </section>
 
+  <button class="reveal second" id="nextDay">接著讀下一天 ›</button>
+
   <details>
     <summary>我的信仰點滴</summary>
     <div class="chips"><button class="chip on" data-f="all">全部</button><button class="chip" data-f="ch" id="chipCh">只看這一章</button></div>
@@ -322,7 +325,7 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
     <p>這些紀錄都存在你現在用的這支手機或這台電腦上，只有你自己看得到。換一台裝置，或清除瀏覽器資料，之前的紀錄就看不到了。</p>
     <p>經文最後的「參考其他版本」會打開 bible.com，先顯示現代中文譯本 2019 版，在那裡也能切換成其他譯本。讀完切回這裡繼續。</p>
     <p>依打開的時間自動切換：早安 5:00～10:59、午安 11:00～17:59、晚安 18:00 以後（畫面變深色）。禱告的開頭和祝福會跟著時段變化。</p>
-    <p>經文下方往下滑是本月讀經進度。讀到這一章的最後，或按下「心情故事」，那一天就會打勾。還沒打勾的日子，點一下就能回去補讀。</p>
+    <p>經文下方往下滑是本月讀經進度。讀到這一章的最後，或按下「心情故事」，那一天就會打勾。還沒打勾的日子，點一下就能回去補讀；想多讀幾天也可以，超前讀完一樣會打勾。最後一頁下面的「接著讀下一天」，可以直接接到隔天。同一章讀過很多遍也沒關係，每次都可能讀到不一樣的亮光。</p>
   </details>
   </section>
 
@@ -1527,11 +1530,11 @@ function verseFor(d){
   const idx = (d.getFullYear() - 2026) * 12 + (d.getMonth() - 10);
   return list[((idx % n) + n) % n] || 1;
 }
-// 讀過的日子：讀到這一章最後，或按下「心情故事」，就記下來（只記今天以前的日子）
+// 讀過的日子：讀到這一章最後，或按下「心情故事」，就記下來（超前讀也算）
 const rdKey = d => "rd:" + key(d);
 function isRead(d){ try { return localStorage.getItem(rdKey(d)) === "1"; } catch(e){ return false; } }
 function markRead(){
-  if (cur > todayD || isRead(cur)) return;
+  if (isRead(cur)) return;
   try { localStorage.setItem(rdKey(cur), "1"); } catch(e){ return; }
   renderPlan();
 }
@@ -1583,6 +1586,8 @@ function render(){
   $("monthTag").textContent = mx ? `${m+1} 月 · 出自第 ${sv} 節 · 每月換下一節` : "";
 
   renderPlan();
+  const nd = new Date(cur.getFullYear(), m, day+1);
+  $("nextDay").textContent = `接著讀 ${nd.getMonth()+1} 月 ${nd.getDate()} 日 ›`;
 
   // 本章已寫好的格言（依節排列）
   const done = SETS[day] ? Object.keys(SETS[day]).map(Number).sort((a,b)=>a-b) : [];
@@ -1599,14 +1604,13 @@ function renderPlan(){
   const m = cur.getMonth(), y = cur.getFullYear(), n = daysIn(cur);
   $("planSum").textContent = `${m+1} 月讀經進度`;
   const dots = $("dots"); dots.innerHTML = "";
-  let read = 0, due = 0;
+  let read = 0;
   for (let i=1;i<=31;i++){
     const b = document.createElement("button");
     b.className = "dot"; b.textContent = i;
     const di = new Date(y, m, i);
     if (i > n){ b.disabled = true; b.setAttribute("aria-label", `這個月沒有 ${i} 號`); dots.appendChild(b); continue; }
     const done = isRead(di);
-    if (di <= todayD) due++;
     if (done){ read++; b.classList.add("done"); }
     else if (di > todayD) b.classList.add("later");
     if (i === cur.getDate()) b.classList.add("sel");
@@ -1614,7 +1618,7 @@ function renderPlan(){
     b.onclick = () => go(di);
     dots.appendChild(b);
   }
-  $("planCount").innerHTML = due ? `已讀 <b>${read}</b> / ${due} 章` : "";
+  $("planCount").innerHTML = `已讀 <b>${read}</b> / ${n} 章`;
 }
 
 let reflectBase = "";
@@ -1649,6 +1653,7 @@ function showPage(n, dir){
 }
 $("toStory").onclick = () => { markRead(); showPage(2, 1); };
 $("toMaxim").onclick = () => showPage(3, 1);
+$("nextDay").onclick = () => go(new Date(cur.getFullYear(), cur.getMonth(), cur.getDate()+1));
 document.querySelectorAll(".back").forEach(b => b.onclick = () => showPage(+b.dataset.go, -1));
 
 // ── 經文框：高度貼齊螢幕，正在讀的那一節變色 ──
