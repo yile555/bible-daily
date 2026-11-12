@@ -297,7 +297,6 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
       <summary>使用說明</summary>
       <p class="tipline">每一節經文都可以點選，裡面有註釋、筆記、標記重點。</p>
       <dl class="tips">
-        <dt><span class="ic gold" id="helpSv">1</span></dt><dd>今天的恩典小品出自這一節</dd>
         <dt><span class="ic pen"></span></dt><dd>這一節寫過筆記</dd>
         <dt><span class="ic ok">✓</span></dt><dd>讀完自動打勾</dd>
       </dl>
@@ -1664,7 +1663,6 @@ function render(){
   const sv = svNow();
   const svLi = $("vlist").querySelector(`li[data-ch="${day}"][data-v="${sv}"]`);
   if (svLi) svLi.classList.add("storyv");
-  $("helpSv").textContent = vLabel(day, sv);
   $("tcvLink").href = `https://www.bible.com/zh-TW/bible/3283/PRO.${day}.TCV2019T`;
   $("tcvLink").textContent = "參考其他版本 ›";
 
