@@ -272,7 +272,7 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
       <div class="frame" id="frame">
         <ol class="vlist" id="vlist"></ol>
         <div class="endbox" id="endbox">
-          <button class="reveal" id="toStory">心情故事 ›</button>
+          <button class="reveal" id="toStory">恩典小品 ›</button>
           <a class="tcv" id="tcvLink" href="#" target="_blank" rel="noopener">參考其他版本 ›</a>
         </div>
       </div></div>
@@ -287,17 +287,17 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
     <details class="help">
       <summary>使用說明</summary>
       <h4>每天怎麼讀</h4>
-      <p>經文一節一行，往上滑讀下一節，淺色橫條標出正在讀的那一行。讀到最後按「心情故事」，再按「今日格言」，會看到格言和今日禱告。</p>
+      <p>經文一節一行，往上滑讀下一節，淺色橫條標出正在讀的那一行。讀到最後按「恩典小品」，再按「今日格言」，會看到格言和今日禱告。</p>
       <h4>兩種讀經方式</h4>
       <p>在讀經進度下面隨時可以切換，寫過的紀錄不會不見。</p>
       <p>依日期：幾號讀第幾章。沒有 31 號的月份，讀不到的章會拆成小段，加在月底那幾天，每天多讀幾節。</p>
       <p>依進度：讀完一章接下一章，31 章讀完再從頭。隔幾天沒讀也不會落後。</p>
       <h4>讀經進度</h4>
-      <p>讀到這一章的最後，或按「心情故事」，就會打勾。沒打勾的格子點一下可以回去補讀，超前讀完也會打勾。最後一頁的「接著讀下一天」可以直接接下去。同一章讀很多遍也沒關係，每次都可能有不一樣的亮光。</p>
+      <p>讀到這一章的最後，或按「恩典小品」，就會打勾。沒打勾的格子點一下可以回去補讀，超前讀完也會打勾。最後一頁的「接著讀下一天」可以直接接下去。同一章讀很多遍也沒關係，每次都可能有不一樣的亮光。</p>
       <h4>點經文</h4>
       <p>點任何一節，可以看註釋、寫下這節的感動（會自動記日期）、用顏色標記、複製，或對照其他版本。寫過感動的經節旁邊有一個小金點。</p>
-      <h4>心情故事</h4>
-      <p>故事、默想、格言和禱告，都出自這一章的某一節，節號是金底白字的那一節就是出處；每讀一次這一章，就換下一節。故事上方的兩個字，是聖靈九種果子之一。默想是留給你的小問題，想到什麼可以寫進「屬於你的心情故事」。</p>
+      <h4>恩典小品</h4>
+      <p>每天的恩典小品，可能是一個故事、一段聖經場景、一篇短文或一個觀察，都從經文裡的恩典出發。小品、默想、格言和禱告，都出自這一章的某一節，節號是金底白字的那一節就是出處；每讀一次這一章，就換下一節。小品上方的兩個字，是聖靈九種果子之一。默想是留給你的小問題，想到什麼可以寫進「屬於你的心情故事」。</p>
       <h4>我的紀錄</h4>
       <p>「我的信仰點滴」會把每節的感動和每天的心情，照日期排在一起。這些紀錄存在你現在用的這支手機或這台電腦上，只有你看得到；換裝置或清除瀏覽器資料，就看不到了。</p>
       <h4>其他</h4>
@@ -309,7 +309,7 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
   <section class="page" id="p2" hidden>
     <article class="story" id="story">
       <div class="srcbox" id="srcBox"><span class="sl">出處</span><span class="sref" id="storySrc"></span><span class="stx" id="storyVerse"></span></div>
-      <div class="tag"><span id="storyLabel">今日心情故事</span><span class="fruit" id="fruit"></span></div>
+      <div class="tag"><span id="storyLabel">今日恩典小品</span><span class="fruit" id="fruit"></span></div>
       <p id="storyText"></p>
       <div class="reflect" id="reflect" hidden><span class="rt">默想</span><p id="reflectText"></p></div>
     </article>
@@ -1538,9 +1538,9 @@ const NOTES = {
 
 // ── 禱告的開頭與祝福，依早安／午安／晚安變化 ──
 const MODES = {
-  morning:   { greet:"早安", story:"今日心情故事", open:"親愛的天父，", bless:"早安，願今天的你被祝福圍繞。" },
-  afternoon: { greet:"午安", story:"今日心情故事", open:"親愛的天父，", bless:"午安，停下來深呼吸，謝謝此刻擁有的一切。" },
-  night:     { greet:"晚安", story:"今晚心情故事", open:"親愛的天父，", bless:"晚安，願天父的愛陪你安穩入睡。" }
+  morning:   { greet:"早安", story:"今日恩典小品", open:"親愛的天父，", bless:"早安，願今天的你被祝福圍繞。" },
+  afternoon: { greet:"午安", story:"今日恩典小品", open:"親愛的天父，", bless:"午安，停下來深呼吸，謝謝此刻擁有的一切。" },
+  night:     { greet:"晚安", story:"今晚恩典小品", open:"親愛的天父，", bless:"晚安，願天父的愛陪你安穩入睡。" }
 };
 function currentMode(){ const h = new Date().getHours(); return h>=5&&h<11 ? "morning" : (h>=11&&h<18 ? "afternoon" : "night"); }
 
@@ -1618,7 +1618,7 @@ function rangeText(list){
   list.forEach(x => { const last = g[g.length-1]; if (last && last.ch === x.ch) last.b = x.v; else g.push({ch:x.ch, a:x.v, b:x.v}); });
   return g.map(x => `第 ${x.ch} 章 ${x.a === x.b ? x.a : x.a+"–"+x.b} 節`).join("、");
 }
-// 讀過的日子：讀到這一章最後，或按下「心情故事」，就記下來（超前讀也算）
+// 讀過的日子：讀到這一章最後，或按下「恩典小品」，就記下來（超前讀也算）
 const rdKey = d => "rd:" + key(d);
 function isRead(d){ try { return localStorage.getItem(rdKey(d)) === "1"; } catch(e){ return false; } }
 function markRead(){
@@ -1670,7 +1670,7 @@ function render(){
   $("tcvLink").textContent = "參考其他版本 ›";
 
   const st = setNow();
-  $("storyText").innerHTML = st ? st.story.split(/\n\s*\n/).map(x=>`<span class="para">${esc(x.trim())}</span>`).join("") : `第 ${day} 章第 ${sv} 節的心情故事還在準備中。`;
+  $("storyText").innerHTML = st ? st.story.split(/\n\s*\n/).map(x=>`<span class="para">${esc(x.trim())}</span>`).join("") : `第 ${day} 章第 ${sv} 節的恩典小品還在準備中。`;
   $("fruit").textContent = st ? st.fruit : "";
   $("fruit").hidden = !st;
   $("storySrc").textContent = `${day}:${vLabel(day,sv)}`;
@@ -1774,7 +1774,7 @@ document.querySelectorAll(".modesw button[data-m]").forEach(b => b.onclick = () 
   toast(mode === "seq" ? "已改成依進度" : "已改成依日期");
 });
 $("today").onclick = () => go(todayD);
-// ── 分頁：經文 → 心情故事 → 今日格言 ──
+// ── 分頁：經文 → 恩典小品 → 今日格言 ──
 let page = 1;
 function showPage(n, dir){
   page = n;
@@ -1796,9 +1796,9 @@ $("nextDay").onclick = () => step(1);
 function renderNav(){
   const prev = $("pnPrev"), next = $("pnNext"), home = $("pnHome");
   prev.disabled = page === 1;
-  prev.textContent = page === 2 ? "‹ 經文" : "‹ 心情故事";
+  prev.textContent = page === 2 ? "‹ 經文" : "‹ 恩典小品";
   home.disabled = false;
-  next.textContent = page === 1 ? "心情故事 ›" : page === 2 ? "今日格言 ›" : (mode === "seq" ? "下一章 ›" : "下一天 ›");
+  next.textContent = page === 1 ? "恩典小品 ›" : page === 2 ? "今日格言 ›" : (mode === "seq" ? "下一章 ›" : "下一天 ›");
 }
 $("pnPrev").onclick = () => { if (page > 1) showPage(page - 1, -1); };
 $("pnNext").onclick = () => {
