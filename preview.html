@@ -110,6 +110,12 @@ summary{cursor:pointer;padding:10px 0;font-size:14px;font-weight:500;color:var(-
 .plan .ph b{font-weight:600;color:var(--ink)}
 .plan .pc{font-variant-numeric:tabular-nums}
 .plan .pc b{color:var(--accent)}
+.modesw{display:flex;align-items:center;justify-content:center;gap:8px;margin:2px 0 12px;font-size:13px;color:var(--muted)}
+.modesw .seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.modesw button{border:0;background:transparent;color:var(--muted);font-family:inherit;font-size:13px;padding:5px 12px;cursor:pointer}
+.modesw button.on{background:var(--accent);color:#fff}
+body.night .modesw button.on{color:#10201d}
+.vlist li.mkhead{display:block;margin:22px 0 10px;padding-top:12px;border-top:1px dashed var(--gold);font-size:13px;color:var(--gold);letter-spacing:.08em}
 .list{margin:0 0 12px;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
 .list li{display:grid;grid-template-columns:3.4em 1fr;gap:8px;font-size:15px}
 .list li span{color:var(--muted);font-size:12px;padding-top:3px;font-variant-numeric:tabular-nums}
@@ -230,7 +236,7 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
 .story #storyText .para{display:block}
 .story #storyText .para + .para{margin-top:.7em}
 .vlist li.storyv .n{color:#fff;background:var(--gold);border-radius:4px;padding:0 3px;margin-left:-3px}
-.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:14px;padding:9px 16px;border-radius:999px;z-index:30;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:var(--paper);font-size:14px;padding:9px 16px;border-radius:999px;z-index:30;opacity:0;transition:opacity .25s;pointer-events:none}
 .toast.show{opacity:1}
 </style>
 </head>
@@ -263,6 +269,7 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
     <div class="plan" id="plan">
       <div class="ph"><b id="planSum">本月讀經進度</b><span class="pc" id="planCount"></span></div>
       <div class="dots" id="dots"></div>
+      <div class="modesw"><span>讀經方式</span><div class="seg"><button data-m="date" id="mDate">依日期</button><button data-m="seq" id="mSeq">依進度</button></div></div>
     </div>
   </section>
 
@@ -315,7 +322,9 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
 
   <details>
     <summary>怎麼用</summary>
-    <p>箴言有 31 章，幾號就讀第幾章，一個月讀完一輪。</p>
+    <p>箴言有 31 章，有兩種讀法，在讀經進度下面隨時可以切換：</p>
+    <p>「依日期」：幾號就讀第幾章，一個月讀完一輪。沒有 31 號的月份，第 31 章會拆成幾小段，加在月底那幾天，每天多讀幾節（2 月也會這樣補第 29、30 章），不用一次補很多。</p>
+    <p>「依進度」：不看日期，讀完一章，下次就接下一章，讀完第 31 章再從第 1 章開始。中間隔幾天沒讀也不會落後，適合還在養成習慣的人。</p>
     <p>經文一節一行，正在讀的那一節顏色比較深，往上滑就換下一節，不怕讀到一半找不到位置。讀到最後，按「心情故事」換到下一頁，再按「今日格言」，會一起出現今日禱告。每個月的故事、格言、默想和禱告，都出自這一章的某一節：這個月用第 1 節，下個月用第 2 節，一直往下輪，輪完最後一節再從頭開始。經文裡節號是金底白字的那一節，就是這個月故事的出處。</p>
     <p>點一下任何一節經文，可以看這節的註釋、寫下感動、用顏色標記、複製，或對照其他版本。標記會留在這台裝置上，下個月讀到同一章還看得到。</p>
     <p>故事最後的「默想」，是留給你的一個小問題。想到什麼，可以寫進下面的「屬於你的心情故事」，沒有標準答案，想不到也沒關係。</p>
@@ -1525,46 +1534,108 @@ const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'
 // 和合本有兩處把兩節合成一節（23:31–32、26:18–19），TEXT 裡用空字串佔住後面那一節，節號才會和其他譯本一致
 const realVerses = ch => (TEXT[ch] || [""]).map((t,i)=>t===""?0:i+1).filter(Boolean);
 const vLabel = (ch,v) => (TEXT[ch] && TEXT[ch][v] === "") ? `${v}–${v+1}` : `${v}`;
+// 依日期：故事的出處每「讀到這一章一次」往下換一節。
+// 1–28 章每個月都有，等於每月換一節；29–31 章只在有這一天的月份才往下換，才不會有故事被跳過。
 function verseFor(d){
-  const list = realVerses(d.getDate()), n = list.length || 1;
-  const idx = (d.getFullYear() - 2026) * 12 + (d.getMonth() - 10);
+  const day = d.getDate(), list = realVerses(day), n = list.length || 1;
+  let idx = 0;
+  const months = (d.getFullYear() - 2026) * 12 + (d.getMonth() - 10);
+  if (months <= 0) idx = months;
+  else for (let k=0; k<months; k++){ if (new Date(2026, 10+k+1, 0).getDate() >= day) idx++; }
   return list[((idx % n) + n) % n] || 1;
+}
+
+// ── 讀經方式：依日期（幾號讀第幾章）／依進度（讀完一章接下一章，31 章讀完再從頭） ──
+const LS = {
+  get(k,d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+let mode = LS.get("set:mode", "date");
+let seq = null;   // 依進度目前讀的章：{ch, v, done, date}
+function seqVerse(ch){ const list = realVerses(ch), n = list.length || 1; return list[LS.get("seq:cnt:"+ch, 0) % n] || 1; }
+function seqOpen(ch){
+  const r = LS.get("seq:round", {n:1, done:[]});
+  if (r.done.length >= 31){ r.n++; r.done = []; LS.set("seq:round", r); }
+  seq = {ch, v: seqVerse(ch), done:false, date:""};
+  LS.set("seq:cur", seq);
+}
+function seqLoad(){
+  seq = LS.get("seq:cur", null);
+  if (!seq) seqOpen(todayD.getDate());
+  else if (seq.done && seq.date < key(todayD)) seqOpen(seq.ch % 31 + 1);   // 昨天讀完了，今天自動接下一章
+}
+if (mode === "seq") seqLoad();
+const chNow = () => mode === "seq" ? seq.ch : cur.getDate();
+const svNow = () => mode === "seq" ? seq.v : verseFor(cur);
+function setNow(){ const s = SETS[chNow()]; return s ? s[svNow()] || null : null; }
+
+// 依日期：短的月份，把讀不到的章（例如 11 月的第 31 章）拆開，每天約 5 節，分散補在月底那幾天
+function makeup(d){
+  const n = daysIn(d); if (n >= 31) return [];
+  const all = [];
+  for (let ch=n+1; ch<=31; ch++) realVerses(ch).forEach(v => all.push({ch, v}));
+  const K = Math.min(n, Math.ceil(all.length / 5)), start = n - K + 1, day = d.getDate();
+  if (day < start) return [];
+  const i = day - start;
+  return all.slice(Math.floor(all.length*i/K), Math.floor(all.length*(i+1)/K));
+}
+function rangeText(list){
+  const g = [];
+  list.forEach(x => { const last = g[g.length-1]; if (last && last.ch === x.ch) last.b = x.v; else g.push({ch:x.ch, a:x.v, b:x.v}); });
+  return g.map(x => `第 ${x.ch} 章 ${x.a === x.b ? x.a : x.a+"–"+x.b} 節`).join("、");
 }
 // 讀過的日子：讀到這一章最後，或按下「心情故事」，就記下來（超前讀也算）
 const rdKey = d => "rd:" + key(d);
 function isRead(d){ try { return localStorage.getItem(rdKey(d)) === "1"; } catch(e){ return false; } }
 function markRead(){
+  if (mode === "seq"){
+    if (seq.done) return;
+    seq.done = true; seq.date = key(todayD); LS.set("seq:cur", seq);
+    LS.set("seq:cnt:"+seq.ch, LS.get("seq:cnt:"+seq.ch, 0) + 1);
+    const r = LS.get("seq:round", {n:1, done:[]});
+    if (!r.done.includes(seq.ch)) r.done.push(seq.ch);
+    LS.set("seq:round", r);
+    renderPlan(); return;
+  }
   if (isRead(cur)) return;
   try { localStorage.setItem(rdKey(cur), "1"); } catch(e){ return; }
   renderPlan();
 }
-function setFor(d){ const s = SETS[d.getDate()]; return s ? s[verseFor(d)] || null : null; }
-function maximFor(d){ const s = setFor(d); return s ? s.maxim : null; }
+function maximFor(){ const s = setNow(); return s ? s.maxim : null; }
 
 // ── 畫面 ──
 function render(){
-  const day = cur.getDate(), m = cur.getMonth();
-  $("dateText").textContent = `${m+1} 月 ${day} 日（${WEEK[cur.getDay()]}）`;
-  $("today").hidden = same(cur, todayD);
+  const day = chNow(), m = cur.getMonth();
+  if (mode === "seq"){
+    $("dateText").textContent = `依進度・第 ${LS.get("seq:round",{n:1}).n} 輪`;
+    $("today").hidden = true;
+  } else {
+    $("dateText").textContent = `${m+1} 月 ${cur.getDate()} 日（${WEEK[cur.getDay()]}）`;
+    $("today").hidden = same(cur, todayD);
+  }
 
   $("chTitle").textContent = `箴言 第 ${day} 章`;
   const verses = TEXT[day];
   if (verses){
     $("verLine").hidden = false;
-    $("vlist").innerHTML = verses.map((v,i)=> v==="" ? "" : `<li data-v="${i+1}"><span class="n">${vLabel(day,i+1)}</span><span class="vt${hlClass(day,i+1)}">${esc(v).replace(/；(?!$)/g,"；<br>")}</span></li>`).join("");
+    const vli = (ch,v) => `<li data-ch="${ch}" data-v="${v}"><span class="n">${vLabel(ch,v)}</span><span class="vt${hlClass(ch,v)}">${esc(TEXT[ch][v-1]).replace(/；(?!$)/g,"；<br>")}</span></li>`;
+    let html = verses.map((v,i)=> v==="" ? "" : vli(day,i+1)).join("");
+    const mk = mode === "date" ? makeup(cur) : [];
+    if (mk.length) html += `<li class="mkhead">月底補讀・${rangeText(mk)}</li>` + mk.map(x => vli(x.ch, x.v)).join("");
+    $("vlist").innerHTML = html;
   } else {
     $("verLine").hidden = true;
     $("vlist").innerHTML = `<li class="active"><span class="n"></span><span class="vt">這一章的經文還沒放進來，可以先按下面的「參考其他版本」到網路上讀。</span></li>`;
   }
 
   if (verses) markNoted();
-  const sv = verseFor(cur);
-  const svLi = $("vlist").querySelector(`li[data-v="${sv}"]`);
+  const sv = svNow();
+  const svLi = $("vlist").querySelector(`li[data-ch="${day}"][data-v="${sv}"]`);
   if (svLi) svLi.classList.add("storyv");
   $("tcvLink").href = `https://www.bible.com/zh-TW/bible/3283/PRO.${day}.TCV2019T`;
   $("tcvLink").textContent = "參考其他版本 ›";
 
-  const st = setFor(cur);
+  const st = setNow();
   $("storyText").innerHTML = st ? st.story.split(/\n\s*\n/).map(x=>`<span class="para">${esc(x.trim())}</span>`).join("") : `第 ${day} 章第 ${sv} 節的心情故事還在準備中。`;
   $("fruit").textContent = st ? st.fruit : "";
   $("fruit").hidden = !st;
@@ -1579,15 +1650,15 @@ function render(){
   $("prayerText").textContent = st ? `${md.open}${st.prayer}奉耶穌基督的名禱告，阿門。` : `${md.open}謝謝祢今天又讓我讀祢的話，願祢的話留在我心裡。奉耶穌基督的名禱告，阿門。`;
   $("bless").textContent = md.bless;
   $("chap").textContent = `箴言 ${day}:${sv}`;
-  const mx = maximFor(cur);
+  const mx = maximFor();
   // 格言在逗號處換行，避免字被拆開
   $("maxim").innerHTML = mx ? mx.split(/(?<=，)/).map(x=>`<span class="seg">${esc(x)}</span>`).join("") : `第 ${day} 章第 ${sv} 節的格言還在準備中。`;
   $("maxim").classList.toggle("empty", !mx);
-  $("monthTag").textContent = mx ? `${m+1} 月 · 出自第 ${sv} 節 · 每月換下一節` : "";
+  $("monthTag").textContent = !mx ? "" : (mode === "seq" ? `出自第 ${sv} 節 · 每讀一次這章換下一節` : `${m+1} 月 · 出自第 ${sv} 節 · 每月換下一節`);
 
   renderPlan();
-  const nd = new Date(cur.getFullYear(), m, day+1);
-  $("nextDay").textContent = `接著讀 ${nd.getMonth()+1} 月 ${nd.getDate()} 日 ›`;
+  if (mode === "seq") $("nextDay").textContent = `接著讀第 ${day % 31 + 1} 章 ›`;
+  else { const nd = new Date(cur.getFullYear(), m, cur.getDate()+1); $("nextDay").textContent = `接著讀 ${nd.getMonth()+1} 月 ${nd.getDate()} 日 ›`; }
 
   // 本章已寫好的格言（依節排列）
   const done = SETS[day] ? Object.keys(SETS[day]).map(Number).sort((a,b)=>a-b) : [];
@@ -1601,6 +1672,25 @@ function render(){
 }
 
 function renderPlan(){
+  $("mDate").classList.toggle("on", mode === "date");
+  $("mSeq").classList.toggle("on", mode === "seq");
+  if (mode === "seq"){
+    const r = LS.get("seq:round", {n:1, done:[]});
+    $("planSum").textContent = `第 ${r.n} 輪讀經進度`;
+    const dots = $("dots"); dots.innerHTML = "";
+    for (let i=1;i<=31;i++){
+      const b = document.createElement("button");
+      b.className = "dot"; b.textContent = i;
+      const done = r.done.includes(i);
+      if (done) b.classList.add("done");
+      if (i === seq.ch) b.classList.add("sel");
+      b.setAttribute("aria-label", `第 ${i} 章${done ? "，已讀" : ""}`);
+      b.onclick = () => seqGo(i);
+      dots.appendChild(b);
+    }
+    $("planCount").innerHTML = `已讀 <b>${r.done.length}</b> / 31 章`;
+    return;
+  }
   const m = cur.getMonth(), y = cur.getFullYear(), n = daysIn(cur);
   $("planSum").textContent = `${m+1} 月讀經進度`;
   const dots = $("dots"); dots.innerHTML = "";
@@ -1634,8 +1724,21 @@ function applyMode(){
 setInterval(applyMode, 60000);
 
 function go(d){ cur = new Date(d.getFullYear(), d.getMonth(), d.getDate()); render(); showPage(1, 0); }
-$("prev").onclick = () => go(new Date(cur.getFullYear(), cur.getMonth(), cur.getDate()-1));
-$("next").onclick = () => go(new Date(cur.getFullYear(), cur.getMonth(), cur.getDate()+1));
+function seqGo(ch){ if (ch !== seq.ch) seqOpen(ch); render(); showPage(1, 0); }
+function step(n){
+  if (mode === "seq") seqGo(((seq.ch - 1 + n) % 31 + 31) % 31 + 1);
+  else go(new Date(cur.getFullYear(), cur.getMonth(), cur.getDate()+n));
+}
+$("prev").onclick = () => step(-1);
+$("next").onclick = () => step(1);
+document.querySelectorAll(".modesw button").forEach(b => b.onclick = () => {
+  if (b.dataset.m === mode) return;
+  mode = b.dataset.m; LS.set("set:mode", mode);
+  cur = new Date(todayD);
+  if (mode === "seq") seqLoad();
+  render(); showPage(1, 0);
+  toast(mode === "seq" ? "已改成依進度" : "已改成依日期");
+});
 $("today").onclick = () => go(todayD);
 // ── 分頁：經文 → 心情故事 → 今日格言 ──
 let page = 1;
@@ -1653,7 +1756,7 @@ function showPage(n, dir){
 }
 $("toStory").onclick = () => { markRead(); showPage(2, 1); };
 $("toMaxim").onclick = () => showPage(3, 1);
-$("nextDay").onclick = () => go(new Date(cur.getFullYear(), cur.getMonth(), cur.getDate()+1));
+$("nextDay").onclick = () => step(1);
 document.querySelectorAll(".back").forEach(b => b.onclick = () => showPage(+b.dataset.go, -1));
 
 // ── 經文框：高度貼齊螢幕，正在讀的那一節變色 ──
@@ -1681,7 +1784,7 @@ function layoutFrame(keep){
   markActive();
 }
 function markActive(){
-  const items = [...$("vlist").children, $("endbox")];
+  const items = [...$("vlist").querySelectorAll("li:not(.mkhead)"), $("endbox")];
   const line = frame.scrollTop + padTop + 6 + 12;
   let idx = 0;
   items.forEach((el,i) => { if (el.offsetTop <= line) idx = i; });
@@ -1690,8 +1793,8 @@ function markActive(){
     el.classList.toggle("read", i < idx);
   });
   const total = items.length - 1;
-  $("prog").textContent = TEXT[cur.getDate()] ? `${Math.min(idx+1,total)} / ${total}` : "";
-  if (idx === items.length - 1 && TEXT[cur.getDate()]) markRead();
+  $("prog").textContent = TEXT[chNow()] ? `${Math.min(idx+1,total)} / ${total}` : "";
+  if (idx === items.length - 1 && TEXT[chNow()]) markRead();
   if (idx > 0 && !hintDone){ hintDone = true; $("hint").classList.add("gone"); }
 }
 let ticking = false;
@@ -1709,7 +1812,7 @@ $("vlist").addEventListener("click", e => {
   picked = li;
   document.querySelectorAll(".vlist li.picked").forEach(x => x.classList.remove("picked"));
   li.classList.add("picked");
-  const ch = cur.getDate(), v = +li.dataset.v;
+  const ch = +li.dataset.ch, v = +li.dataset.v;
   $("sRef").textContent = `箴言 ${ch}:${vLabel(ch,v)}`;
   $("sText").textContent = TEXT[ch][v-1];
   const nt = (NOTES[ch] || {})[v];
@@ -1736,7 +1839,7 @@ $("sheet").addEventListener("click", e => { if (e.target === $("sheet")) closeSh
 $("sCompare").addEventListener("click", () => setTimeout(closeSheet, 300));
 document.querySelectorAll(".cdot").forEach(d => d.onclick = () => {
   if (!picked) return;
-  const ch = cur.getDate(), v = +picked.dataset.v, c = d.dataset.c;
+  const ch = +picked.dataset.ch, v = +picked.dataset.v, c = d.dataset.c;
   hlSet(ch,v,c);
   const vt = picked.querySelector(".vt");
   vt.className = "vt" + (c ? " hl-"+c : "");
@@ -1744,7 +1847,7 @@ document.querySelectorAll(".cdot").forEach(d => d.onclick = () => {
 });
 function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(()=>t.classList.remove("show"), 1800); }
 $("sCopy").onclick = async () => {
-  const ch = cur.getDate(), v = +picked.dataset.v;
+  const ch = +picked.dataset.ch, v = +picked.dataset.v;
   const text = `${TEXT[ch][v-1]}（箴言 ${ch}:${vLabel(ch,v)}，和合本）`;
   try { await navigator.clipboard.writeText(text); }
   catch(e){ const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch(_){} ta.remove(); }
@@ -1762,7 +1865,7 @@ function vnAll(){
 }
 const fmtDate = d => { const [y,m,dd] = d.split("-"); return `${y}/${+m}/${+dd}`; };
 function vnRender(){
-  const ch = cur.getDate(), v = +picked.dataset.v, list = vnGet(ch,v);
+  const ch = +picked.dataset.ch, v = +picked.dataset.v, list = vnGet(ch,v);
   $("vnTitle").textContent = list.length ? `我的感動（${list.length}）` : "我的感動";
   $("vnList").innerHTML = list.slice().reverse().map(n => `<li><div class="h">${fmtDate(n.date)}<button data-ts="${n.ts}">刪除</button></div><div class="t">${esc(n.text)}</div></li>`).join("");
   $("vnList").querySelectorAll("button[data-ts]").forEach(b => b.onclick = () => {
@@ -1772,14 +1875,13 @@ function vnRender(){
   });
 }
 function markNoted(){
-  const ch = cur.getDate();
-  document.querySelectorAll("#vlist li[data-v]").forEach(li => li.classList.toggle("noted", vnGet(ch, +li.dataset.v).length > 0));
+  document.querySelectorAll("#vlist li[data-v]").forEach(li => li.classList.toggle("noted", vnGet(+li.dataset.ch, +li.dataset.v).length > 0));
 }
 $("vnOpen").onclick = () => { $("vnOpen").hidden = true; $("vnForm").hidden = false; $("vnText").focus(); };
 $("vnText").addEventListener("input", () => { $("vnSave").disabled = !$("vnText").value.trim(); $("vnStatus").textContent = ""; });
 $("vnSave").onclick = () => {
   const text = $("vnText").value.trim(); if (!text || !picked) return;
-  const ch = cur.getDate(), v = +picked.dataset.v;
+  const ch = +picked.dataset.ch, v = +picked.dataset.v;
   const arr = vnGet(ch,v); arr.push({ date: key(new Date()), text, ts: Date.now() });
   if (!vnPut(ch,v,arr)){ $("vnStatus").textContent = "存不進去，請先把文字複製起來"; return; }
   $("vnText").value = ""; $("vnSave").disabled = true;
@@ -1851,11 +1953,11 @@ saveBtn.onclick = async () => {
   const k = key(cur), text = note.value;
   saving = true; saveBtn.disabled = true; statusEl.textContent = "儲存中…";
   try {
-    await store.set(k, { date:k, chapter:cur.getDate(), maxim: maximFor(cur) || "", text, updatedAt: new Date().toISOString() });
+    await store.set(k, { date:k, chapter:chNow(), maxim: maximFor() || "", text, updatedAt: new Date().toISOString() });
     if (k === key(cur)){ loadedText = text; statusEl.textContent = `已儲存到${store.where}`; }
     loadJournal();
   } catch(e){
-    if (store !== local){ store = local; try { await local.set(k, { date:k, chapter:cur.getDate(), maxim: maximFor(cur) || "", text, updatedAt:new Date().toISOString() }); loadedText = text; statusEl.textContent = "帳號存不進去，先存在這台裝置"; } catch(_){ statusEl.textContent = "存不進去，請先把文字複製起來"; } }
+    if (store !== local){ store = local; try { await local.set(k, { date:k, chapter:chNow(), maxim: maximFor() || "", text, updatedAt:new Date().toISOString() }); loadedText = text; statusEl.textContent = "帳號存不進去，先存在這台裝置"; } catch(_){ statusEl.textContent = "存不進去，請先把文字複製起來"; } }
     else statusEl.textContent = "存不進去，請先把文字複製起來";
   }
   saving = false;
@@ -1870,21 +1972,24 @@ document.querySelectorAll(".chip").forEach(c => c.onclick = () => {
 });
 async function loadJournal(){
   const ul = $("journal");
-  $("chipCh").textContent = `只看第 ${cur.getDate()} 章`;
+  $("chipCh").textContent = `只看第 ${chNow()} 章`;
   let days = [];
   try { if (store) days = (await store.all()).filter(o => o && o.text && o.text.trim()); } catch(e){}
   let items = [
     ...days.map(o => ({ kind:"day", date:o.date, ch:o.chapter, text:o.text, ts: Date.parse(o.updatedAt||o.date) || 0 })),
     ...vnAll().map(n => ({ kind:"verse", date:n.date, ch:n.ch, v:n.v, text:n.text, ts:n.ts }))
   ];
-  if (jFilter === "ch") items = items.filter(o => o.ch === cur.getDate());
+  if (jFilter === "ch") items = items.filter(o => o.ch === chNow());
   items.sort((a,b) => a.date === b.date ? b.ts - a.ts : (a.date < b.date ? 1 : -1));
   if (!items.length){ ul.innerHTML = `<li><div class="h">${jFilter === "ch" ? "這一章還沒有寫過。" : "還沒有寫過。讀經時點一下經文，或在上面寫下今天的心情故事，都會出現在這裡。"}</div></li>`; return; }
   ul.innerHTML = items.map(o => {
     const where = o.kind === "verse" ? `箴言 ${o.ch}:${o.v}` : `箴言 ${o.ch} 章 <span class="tag2">心情故事</span>`;
-    return `<li><div class="h">${fmtDate(o.date)} · ${where} · <button data-d="${o.date}">打開這天</button></div><div class="t">${esc(o.text)}</div></li>`;
+    return `<li><div class="h">${fmtDate(o.date)} · ${where} · <button data-d="${o.date}" data-c="${o.ch}">${mode === "seq" ? "打開這章" : "打開這天"}</button></div><div class="t">${esc(o.text)}</div></li>`;
   }).join("");
-  ul.querySelectorAll("button[data-d]").forEach(b => b.onclick = () => { const [y,mo,d] = b.dataset.d.split("-").map(Number); go(new Date(y,mo-1,d)); });
+  ul.querySelectorAll("button[data-d]").forEach(b => b.onclick = () => {
+    if (mode === "seq") return seqGo(+b.dataset.c);
+    const [y,mo,d] = b.dataset.d.split("-").map(Number); go(new Date(y,mo-1,d));
+  });
 }
 
 // 一次性搬移：修正 23、26 章節號之前存下的感動與畫線，往後挪一節（2026-11-11）
