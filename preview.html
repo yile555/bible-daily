@@ -62,7 +62,7 @@ body.night .dot.done{background:#24413b;border-color:#2f5a51}
 .reveal{border:none;border-radius:12px;background:var(--accent);color:#fff;font-size:calc(17px * var(--fs,1));font-weight:700;padding:16px;cursor:pointer}
 .reveal[hidden]{display:none}
 
-.story{background:var(--paper);border-radius:14px;padding:24px 22px 20px;border:1px solid var(--line);display:flex;flex-direction:column;gap:14px}
+.story{position:relative;background:var(--paper);border-radius:14px;padding:24px 22px 20px;border:1px solid var(--line);display:flex;flex-direction:column;gap:14px}
 .story[hidden]{display:none}
 .story .tag{display:flex;align-items:center;gap:8px;font-size:calc(14px * var(--fs,1));color:var(--muted)}
 .story p{font-family:var(--font-display);font-size:calc(20px * var(--fs,1));line-height:1.95;margin:0}
@@ -193,6 +193,10 @@ body.night .vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,
 /* ── 點經文跳出的選單 ── */
 /* 恩典小品裡的人物名字：藍色、可以點，點了看簡單介紹 */
 .who{border:0;background:none;padding:0;font:inherit;color:#2563a8;border-bottom:1px dotted #2563a8;cursor:pointer;line-height:inherit}
+#whoPop{position:absolute;z-index:5;background:#fffdf6;border:1px solid #d9d2bd;border-radius:12px;padding:10px 14px;box-shadow:0 6px 18px rgba(0,0,0,.18);font-size:calc(15px * var(--fs,1));line-height:1.7;color:#3a3a35;display:flex;flex-direction:column;gap:2px}
+#whoPop b{color:#2563a8;font-weight:700}
+body.night #whoPop{background:#2b2d33;border-color:#444;color:#ddd}
+body.night #whoPop b{color:#8cc0ef}
 body.night .who{color:#8cc0ef;border-color:#8cc0ef}
 .wbox{width:100%;max-width:560px;background:var(--paper);color:var(--ink);border-radius:18px 18px 0 0;padding:18px 20px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -6px 24px rgba(0,0,0,.15)}
 .wbox .wn{font-size:calc(19px * var(--fs,1));font-weight:700;color:#2563a8;margin-bottom:6px}
@@ -1666,15 +1670,27 @@ function withCast(text){
   return esc(text).replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m, k, show) =>
     CAST[k] ? `<button class="who" data-k="${k}">${show || k}</button>` : (show || k));
 }
+function closeWho(){ const o=document.getElementById("whoPop"); if(o) o.remove(); }
 document.addEventListener("click", e => {
-  const b = e.target.closest(".who"); if (!b) return;
-  $("whoName").textContent = b.textContent;
-  $("whoText").textContent = CAST[b.dataset.k];
-  $("whoSheet").hidden = false;
+  const b = e.target.closest(".who");
+  if (!b) { if (!e.target.closest("#whoPop")) closeWho(); return; }
+  const card = b.closest(".story"); if (!card) return;
+  const same = document.getElementById("whoPop");
+  const again = same && same.dataset.k === b.dataset.k && same.dataset.i === String(b.dataset.i||"");
+  closeWho(); if (again) return;
+  const pop = document.createElement("div");
+  pop.id = "whoPop"; pop.dataset.k = b.dataset.k; pop.dataset.i = b.dataset.i||"";
+  pop.innerHTML = `<b></b><span></span>`;
+  pop.firstChild.textContent = b.textContent;
+  pop.lastChild.textContent = CAST[b.dataset.k];
+  card.appendChild(pop);
+  const cr = card.getBoundingClientRect(), br = b.getBoundingClientRect();
+  const w = Math.min(280, cr.width - 24);
+  pop.style.width = w + "px";
+  let left = br.left - cr.left; left = Math.max(12, Math.min(left, cr.width - w - 12));
+  pop.style.left = left + "px";
+  pop.style.top = (br.bottom - cr.top + 8) + "px";
 });
-$("whoClose").onclick = () => { $("whoSheet").hidden = true; };
-$("whoSheet").addEventListener("click", e => { if (e.target === $("whoSheet")) $("whoSheet").hidden = true; });
-
 function maximFor(){ const s = setNow(); return s ? s.maxim : null; }
 
 // ── 畫面 ──
