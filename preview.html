@@ -191,6 +191,13 @@ body.night .vt.hl-p{background:linear-gradient(transparent 52%,rgba(242,160,195,
 .hint.gone{opacity:0}
 
 /* ── 點經文跳出的選單 ── */
+/* 恩典小品裡的人物名字：藍色、可以點，點了看簡單介紹 */
+.who{border:0;background:none;padding:0;font:inherit;color:#2563a8;border-bottom:1px dotted #2563a8;cursor:pointer;line-height:inherit}
+body.night .who{color:#8cc0ef;border-color:#8cc0ef}
+.wbox{width:100%;max-width:560px;background:var(--paper);color:var(--ink);border-radius:18px 18px 0 0;padding:18px 20px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -6px 24px rgba(0,0,0,.15)}
+.wbox .wn{font-size:calc(19px * var(--fs,1));font-weight:700;color:#2563a8;margin-bottom:6px}
+body.night .wbox .wn{color:#8cc0ef}
+.wbox p{margin:0;font-size:calc(17px * var(--fs,1));line-height:1.8}
 .sheet{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.25)}
 .sheet[hidden]{display:none}
 .sbox{width:100%;max-width:560px;max-height:82vh;overflow-y:auto;background:var(--paper);color:var(--ink);border-radius:18px 18px 0 0;padding:16px 20px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;box-shadow:0 -6px 24px rgba(0,0,0,.15)}
@@ -357,6 +364,10 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
     <button id="pnNext">下一頁 ›</button>
   </div>
 </nav>
+
+<div class="sheet" id="whoSheet" hidden>
+  <div class="wbox" role="dialog" aria-labelledby="whoName"><div class="srow"><div class="wn" id="whoName"></div><button class="sx" id="whoClose" aria-label="關閉">✕</button></div><p id="whoText"></p></div>
+</div>
 
 <div class="sheet" id="sheet" hidden>
   <div class="sbox" role="dialog" aria-labelledby="sRef">
@@ -1630,6 +1641,38 @@ function markRead(){
   try { localStorage.setItem(rdKey(cur), "1"); } catch(e){ return; }
   renderPlan();
 }
+// ── 人物介紹：故事裡寫 [[爸爸]] 或 [[志明|爸爸]]，就會變成可以點的藍字 ──
+const CAST = {
+  "阿公":  "林家的阿公德水，退休的水電師傅。話很少，家裡什麼壞了都找他，常待在頂樓的菜園。",
+  "阿嬤":  "林家的阿嬤秀蘭，全家的情報中心。禱告最長，最常問：「你有沒有吃飽？」",
+  "爸爸":  "林家的爸爸志明，國中公民老師。什麼事都能講出一番道理，正在學怎麼先聽兒子說完。",
+  "媽媽":  "林家的媽媽美玲，一樓早餐店的老闆娘。嘴快心軟，客人沒錢，她會多煎一顆蛋。",
+  "小姑":  "爸爸的妹妹志芳，帶著女兒安安搬回娘家，在鎮上的縫衣工作室做衣服。嘴上常說「沒事」。",
+  "安安":  "小姑的女兒，8 歲。問題很多，喜歡給每個人取綽號。",
+  "雨晴":  "林家的大女兒，在台北當護理師，放假才回家。最常說的話是「我可以」。",
+  "子揚":  "林家的兒子，高二。嘴很賤、心很軟，對信仰有很多問題。",
+  "阿德伯":"隔壁鎖匠行的老闆，每天在早餐店坐最久。愛虧人，最常說：「你們基督徒喔……」",
+  "阿桃姨":"清潔隊員，每天清晨掃完老街，是早餐店的第一個客人。笑聲很大。",
+  "阿豪":  "子揚的死黨，樂天愛搞笑，常來店裡吃早餐。",
+  "黃牧師":"教會的牧師，說話慢、愛講冷笑話，講道常講自己做錯的事。",
+  "阿哲":  "教會的青少年輔導，平常在修車廠上班，最會在球場上跟人講話。",
+  "秀琴姐":"小組長，媽媽的好姊妹，熱心到有點過頭。",
+  "陳媽媽":"教會的長輩，在家照顧中風的先生，常常沒辦法來聚會。"
+};
+// 先跳脫文字，再把 [[人物]] 換成按鈕
+function withCast(text){
+  return esc(text).replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m, k, show) =>
+    CAST[k] ? `<button class="who" data-k="${k}">${show || k}</button>` : (show || k));
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest(".who"); if (!b) return;
+  $("whoName").textContent = b.textContent;
+  $("whoText").textContent = CAST[b.dataset.k];
+  $("whoSheet").hidden = false;
+});
+$("whoClose").onclick = () => { $("whoSheet").hidden = true; };
+$("whoSheet").addEventListener("click", e => { if (e.target === $("whoSheet")) $("whoSheet").hidden = true; });
+
 function maximFor(){ const s = setNow(); return s ? s.maxim : null; }
 
 // ── 畫面 ──
@@ -1665,7 +1708,7 @@ function render(){
   $("tcvLink").textContent = "參考其他版本 ›";
 
   const st = setNow();
-  $("storyText").innerHTML = st ? st.story.split(/\n\s*\n/).map(x=>`<span class="para">${esc(x.trim())}</span>`).join("") : `第 ${day} 章第 ${sv} 節的恩典小品還在準備中。`;
+  $("storyText").innerHTML = st ? st.story.split(/\n\s*\n/).map(x=>`<span class="para">${withCast(x.trim())}</span>`).join("") : `第 ${day} 章第 ${sv} 節的恩典小品還在準備中。`;
   $("storySrc").textContent = `${day}:${vLabel(day,sv)}`;
   $("storyVerse").textContent = verses ? verses[sv-1] : "";
   const rf = st ? st.reflect : "";
