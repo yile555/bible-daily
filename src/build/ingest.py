@@ -1,6 +1,6 @@
 import re,json,sys
 T=json.load(open('/home/claude/map/text.json'))
-CAST=['阿公','阿嬤','爸爸','媽媽','小姑','安安','雨晴','嘉豪','阿德伯','阿桃姨','阿凱','黃牧師','阿哲','秀琴姐','陳媽媽','王店長','李主委','子揚','阿豪']
+CAST=['阿公','阿嬤','爸爸','媽媽','小姑','安安','雨晴','嘉豪','阿德伯','阿桃姨','阿凱','黃牧師','阿哲','秀琴姐','陳媽媽','王店長','李主委','阿凱的爸爸','子揚','阿豪']
 han=lambda t:len(re.findall(r'[一-鿿]',t))
 def load(path):
     out={}
@@ -27,7 +27,7 @@ def load(path):
         paras=[p for p in re.split(r'\n\s*\n',rf) if p.strip()]
         if len(paras)!=3: iss.append(f'默想{len(paras)}段')
         if not 60<=han(rf)<=130: iss.append(f'默想{han(rf)}')
-        bad=[k for k in re.findall(r'\[\[([^\]|]+)',story) if k not in CAST[:17]]
+        bad=[k for k in re.findall(r'\[\[([^\]|]+)',story) if k not in CAST[:18]]
         if bad: iss.append('未知人物'+str(bad))
         if '子揚' in b or '阿豪' in b: iss.append('舊名')
         out[f'{ch}:{v}']=(b,iss,n)
