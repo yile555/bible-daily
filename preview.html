@@ -106,8 +106,15 @@ summary{cursor:pointer;padding:10px 0;font-size:calc(14px * var(--fs,1));font-we
 .dot.sel{box-shadow:inset 0 0 0 2px var(--accent)}
 .dot:disabled{opacity:.25;cursor:default}
 .plan{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 14px 4px}
-.help h4{margin:14px 0 4px;font-size:calc(16px * var(--fs,1));color:var(--accent)}
-.help p{font-size:calc(16px * var(--fs,1));line-height:1.8;margin:0 0 6px}
+.tips{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;margin:4px 0 14px;font-size:calc(16px * var(--fs,1));line-height:1.6}
+.tips dt{font-weight:600;color:var(--accent);white-space:nowrap}
+.tips dd{margin:0;color:var(--ink)}
+.tips .ic{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;border-radius:5px;font-size:calc(12px * var(--fs,1));font-weight:700}
+.tips .ic.gold{background:var(--gold);color:#fff;padding:0 4px}
+.tips .ic.dotg{min-width:8px;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-left:8px}
+.tips .ic.fr{background:var(--accent);color:#fff;border-radius:999px;padding:0 9px}
+body.night .tips .ic.fr{color:#10201d}
+.tips .ic.ok{background:#d5e6dd;color:var(--accent);border:1px solid #b9d3c6}
 .help{margin-bottom:8px}
 .plan .ph{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;font-size:calc(14px * var(--fs,1));color:var(--muted)}
 .plan .ph b{font-weight:600;color:var(--ink)}
@@ -286,23 +293,18 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
     </div>
     <details class="help">
       <summary>使用說明</summary>
-      <h4>每天怎麼讀</h4>
-      <p>經文一節一行，往上滑讀下一節，淺色橫條標出正在讀的那一行。讀到最後按「恩典小品」，再按「今日格言」，會看到格言和今日禱告。</p>
-      <h4>兩種讀經方式</h4>
-      <p>在讀經進度下面隨時可以切換，寫過的紀錄不會不見。</p>
-      <p>依日期：幾號讀第幾章。沒有 31 號的月份，讀不到的章會拆成小段，加在月底那幾天，每天多讀幾節。</p>
-      <p>依進度：讀完一章接下一章，31 章讀完再從頭。隔幾天沒讀也不會落後。</p>
-      <h4>讀經進度</h4>
-      <p>讀到這一章的最後，或按「恩典小品」，就會打勾。沒打勾的格子點一下可以回去補讀，超前讀完也會打勾。最後一頁的「接著讀下一天」可以直接接下去。同一章讀很多遍也沒關係，每次都可能有不一樣的亮光。</p>
-      <h4>點經文</h4>
-      <p>點任何一節，可以看註釋、寫下這節的感動（會自動記日期）、用顏色標記、複製，或對照其他版本。寫過感動的經節旁邊有一個小金點。</p>
-      <h4>恩典小品</h4>
-      <p>每天的恩典小品，可能是一個故事、一段聖經場景、一篇短文或一個觀察，都從經文裡的恩典出發。小品、默想、格言和禱告，都出自這一章的某一節，節號是金底白字的那一節就是出處；每讀一次這一章，就換下一節。小品上方的兩個字，是聖靈九種果子之一。默想是留給你的小問題，想到什麼可以寫進「屬於你的心情故事」。</p>
-      <h4>我的紀錄</h4>
-      <p>「我的信仰點滴」會把每節的感動和每天的心情，照日期排在一起。這些紀錄存在你現在用的這支手機或這台電腦上，只有你看得到；換裝置或清除瀏覽器資料，就看不到了。</p>
-      <h4>其他</h4>
-      <p>字太小或太大，可以在讀經進度下面的「字體大小」調整，整個工具會一起變。</p>
-      <p>「參考其他版本」會打開 bible.com 的現代中文譯本 2019 版。晚上 6 點以後畫面會變深色。</p>
+      <dl class="tips">
+        <dt>點經文</dt><dd>看註釋、寫感動、畫重點</dd>
+        <dt><span class="ic gold">12</span></dt><dd>今天恩典小品的出處</dd>
+        <dt><span class="ic dotg"></span></dt><dd>寫過感動的經節</dd>
+        <dt><span class="ic ok">✓</span></dt><dd>讀完自動打勾</dd>
+        <dt><span class="ic fr">溫柔</span></dt><dd>聖靈的果子</dd>
+        <dt>依日期</dt><dd>幾號讀第幾章</dd>
+        <dt>依進度</dt><dd>讀完一章接下一章</dd>
+        <dt>月底補讀</dt><dd>短的月份，月底多讀幾節</dd>
+        <dt>默想</dt><dd>留給你的小問題</dd>
+        <dt>紀錄</dt><dd>存在這支手機，換手機會不見</dd>
+      </dl>
     </details>
   </section>
 
