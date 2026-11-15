@@ -355,7 +355,6 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
   <section class="page" id="p3" hidden>
     <article class="card" id="card">
       <div class="ptitle">今日格言</div>
-      <div class="chap" id="chap"></div>
       <p class="maxim" id="maxim"></p>
       <div class="foot" id="monthTag"></div>
     </article>
@@ -6642,12 +6641,11 @@ function render(){
   const md = MODES[currentMode()];
   $("prayerText").textContent = st ? `${md.open}${st.prayer}奉耶穌基督的名禱告，阿門。` : `${md.open}謝謝祢今天又讓我讀祢的話，願祢的話留在我心裡。奉耶穌基督的名禱告，阿門。`;
   $("bless").textContent = md.bless;
-  $("chap").textContent = `箴言 ${day}:${sv}`;
   const mx = maximFor();
   // 格言在逗號處換行，避免字被拆開
   $("maxim").innerHTML = mx ? mx.split(/(?<=，)/).map(x=>`<span class="seg">${esc(x)}</span>`).join("") : `第 ${day} 章第 ${sv} 節的格言還在準備中。`;
   $("maxim").classList.toggle("empty", !mx);
-  $("monthTag").textContent = !mx ? "" : (mode === "seq" ? `出自第 ${sv} 節 · 每讀一次這章換下一節` : `${m+1} 月 · 出自第 ${sv} 節 · 每月換下一節`);
+  $("monthTag").textContent = !mx ? "" : (mode === "seq" ? `改寫自箴言 ${day}:${sv} · 每讀一次這章換下一節` : `${m+1} 月 · 改寫自箴言 ${day}:${sv} · 每月換下一節`);
 
   renderPlan();
   if (mode === "seq") $("nextDay").textContent = `接著讀第 ${day % 31 + 1} 章 ›`;
