@@ -6789,11 +6789,10 @@ function layoutFrame(keep){
   if (page !== 1) return;
   $("plan").hidden = true;
   const top = frame.getBoundingClientRect().top + window.scrollY;
-  let h = Math.max(260, window.innerHeight - top - 84 - document.querySelector(".pnav").offsetHeight);
+  // ★ 調整：經文框盡量拉長，一路延伸到下方按鈕列上面（只留提示字的空間），一次能讀更多節
+  const hintH = $("hint").offsetHeight || 18;
+  let h = Math.max(260, window.innerHeight - top - document.querySelector(".pnav").offsetHeight - hintH - 14);
   frame.style.height = h + "px";
-  // 確保整頁不會超出螢幕（不讓整個畫面捲動）
-  const over = document.documentElement.scrollHeight - window.innerHeight;
-  if (over > 0 && h - over >= 260){ h -= over; frame.style.height = h + "px"; }
   padTop = Math.round(h * 0.2);
   const first = $("vlist").firstElementChild;
   const lh = first ? parseFloat(getComputedStyle(first).lineHeight) : 35;
@@ -6834,6 +6833,10 @@ function markActive(){
 let ticking = false;
 frame.addEventListener("scroll", () => { if (!ticking){ ticking = true; requestAnimationFrame(() => { ticking = false; markActive(); }); } }, {passive:true});
 window.addEventListener("resize", () => layoutFrame(true));
+// ★ 調整：在經文頁，手指不小心滑到上方日期、章名那一帶，整個畫面不會被拖走（點按鈕照常可以用）
+document.querySelectorAll(".greet,.datebar,.shead").forEach(el => {
+  el.addEventListener("touchmove", e => { if (page === 1) e.preventDefault(); }, {passive:false});
+});
 
 // ── 點經文：標記、複製、對照、寫進心情故事 ──
 const hlKey = (ch,v) => `hl:${ch}:${v}`;
