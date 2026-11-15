@@ -331,6 +331,7 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
         <dt><span class="ic pen"></span></dt><dd>這一節寫過筆記</dd>
         <dt><span class="ic ok">✓</span></dt><dd>讀完自動打勾</dd>
       </dl>
+      <p class="tipline">打開過一次之後，沒有網路也能讀。</p>
     </details>
   </section>
 
@@ -7162,6 +7163,9 @@ applyFs();
 render();
 showPage(1, 0);
 connect().then(s => { store = s; loadNote(); loadJournal(); });
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+}
 </script>
 </body>
 </html>
