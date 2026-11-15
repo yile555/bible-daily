@@ -159,6 +159,8 @@ details p{font-size:calc(14px * var(--fs,1));color:var(--muted);margin:0 0 12px}
 
 /* ── 分頁 ── */
 .page[hidden]{display:none}
+.hometitle{margin:6px 0 0;text-align:center;font-family:var(--font-display);font-size:calc(28px * var(--fs,1));letter-spacing:.2em;color:var(--accent)}
+.datebar[hidden]{display:none}
 .page{display:flex;flex-direction:column;gap:18px}
 @media (prefers-reduced-motion:no-preference){
   .page.in-next{animation:pin .35s ease-out}
@@ -296,7 +298,7 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
 <div class="wrap">
 
   <div class="greet" id="greet"></div>
-  <div class="datebar">
+  <div class="datebar" id="datebar">
     <button class="nav" id="prev" aria-label="前一天">‹</button>
     <div class="date">
       <div class="d" id="dateText"></div>
@@ -305,19 +307,9 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
     <button class="nav" id="next" aria-label="後一天">›</button>
   </div>
 
-  <section class="page" id="p1">
-    <div class="scripture" aria-labelledby="chTitle">
-      <div class="shead"><h1 id="chTitle"></h1><span class="ver" id="verLine">和合本</span><span class="prog" id="prog"></span></div>
-      <div class="fwrap"><div class="band" id="band"></div>
-      <div class="frame" id="frame">
-        <ol class="vlist" id="vlist"></ol>
-        <div class="endbox" id="endbox">
-          <button class="reveal" id="toStory">恩典小品 ›</button>
-          <a class="tcv" id="tcvLink" href="#" target="_blank" rel="noopener">參考其他版本 ›</a>
-        </div>
-      </div></div>
-    </div>
-    <p class="hint" id="hint">往上滑，讀下一節</p>
+  <section class="page home" id="p0">
+    <h1 class="hometitle">讀經日常</h1>
+    <button class="reveal" id="startBtn"></button>
     <div class="plan" id="plan">
       <div class="ph"><b id="planSum">本月讀經進度</b><span class="pc" id="planCount"></span></div>
       <div class="dots" id="dots"></div>
@@ -333,6 +325,21 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
       </dl>
       <p class="tipline">打開過一次之後，沒有網路也能讀。</p>
     </details>
+  </section>
+
+  <section class="page" id="p1" hidden>
+    <div class="scripture" aria-labelledby="chTitle">
+      <div class="shead"><h1 id="chTitle"></h1><span class="ver" id="verLine">和合本</span><span class="prog" id="prog"></span></div>
+      <div class="fwrap"><div class="band" id="band"></div>
+      <div class="frame" id="frame">
+        <ol class="vlist" id="vlist"></ol>
+        <div class="endbox" id="endbox">
+          <button class="reveal" id="toStory">恩典小品 ›</button>
+          <a class="tcv" id="tcvLink" href="#" target="_blank" rel="noopener">參考其他版本 ›</a>
+        </div>
+      </div></div>
+    </div>
+    <p class="hint" id="hint">往上滑，讀下一節</p>
   </section>
 
   <section class="page" id="p2" hidden>
@@ -6659,7 +6666,12 @@ function render(){
   loadNote();
 }
 
+function renderHome(){
+  $("startBtn").textContent = mode === "seq" ? `接著讀箴言第 ${seq.ch} 章 ›` : `今天讀箴言第 ${todayD.getDate()} 章 ›`;
+}
+$("startBtn").onclick = () => { if (mode === "seq"){ render(); showPage(1, 0); } else go(todayD); };
 function renderPlan(){
+  renderHome();
   $("mDate").classList.toggle("on", mode === "date");
   $("mSeq").classList.toggle("on", mode === "seq");
   if (mode === "seq"){
@@ -6717,11 +6729,11 @@ function checkDay(canJump){
   canJump = canJump && $("sheet").hidden;
   if (mode === "seq"){
     if (!canJump) return;                      // 正在讀就先不動，下次回到畫面再換
-    todayD = t; cur = new Date(t); seqLoad(); render(); showPage(1, 0); return;
+    todayD = t; cur = new Date(t); seqLoad(); render(); if (page !== 0) showPage(1, 0); return;
   }
   const wasToday = same(cur, todayD);
   todayD = t;
-  if (canJump && wasToday) go(todayD);
+  if (canJump && wasToday) go(todayD, page === 0);
   else { $("today").hidden = same(cur, todayD); renderPlan(); }
 }
 // 時段跨過去（例如 10:59 → 11:00）時自動切換問候與配色
@@ -6731,7 +6743,7 @@ document.addEventListener("visibilitychange", () => { if (document.hidden) flush
 window.addEventListener("pageshow", () => { applyMode(); checkDay(true); });
 window.addEventListener("pagehide", () => { flushNote(); });
 
-function go(d){ cur = new Date(d.getFullYear(), d.getMonth(), d.getDate()); render(); showPage(1, 0); }
+function go(d, stay){ cur = new Date(d.getFullYear(), d.getMonth(), d.getDate()); render(); if (!stay) showPage(1, 0); }
 function seqGo(ch){ if (ch !== seq.ch) seqOpen(ch); render(); showPage(1, 0); }
 function step(n){
   if (mode === "seq") seqGo(((seq.ch - 1 + n) % 31 + 31) % 31 + 1);
@@ -6744,15 +6756,15 @@ document.querySelectorAll(".modesw button[data-m]").forEach(b => b.onclick = () 
   mode = b.dataset.m; LS.set("set:mode", mode);
   cur = new Date(todayD);
   if (mode === "seq") seqLoad();
-  render(); showPage(1, 0);
+  render(); showPage(0, 0);
   toast(mode === "seq" ? "已改成依進度" : "已改成依日期");
 });
 $("today").onclick = () => go(todayD);
 // ── 分頁：經文 → 恩典小品 → 今日格言 ──
-let page = 1;
+let page = 0;
 function showPage(n, dir){
   page = n;
-  [1,2,3].forEach(i => {
+  [0,1,2,3].forEach(i => {
     const el = $("p"+i);
     el.hidden = i !== n;
     el.classList.remove("in-next","in-back");
@@ -6760,6 +6772,8 @@ function showPage(n, dir){
   const el = $("p"+n);
   if (dir) { void el.offsetWidth; el.classList.add(dir > 0 ? "in-next" : "in-back"); }
   window.scrollTo({top:0});
+  $("datebar").hidden = n === 0;
+  document.querySelector(".pnav").hidden = n === 0;
   renderNav();
   if (n === 1) requestAnimationFrame(() => layoutFrame(dir < 0));
 }
@@ -6769,25 +6783,24 @@ $("nextDay").onclick = () => step(1);
 // 下方導覽列：每一頁都有上一頁、首頁、下一頁，方便來回反覆讀
 function renderNav(){
   const prev = $("pnPrev"), next = $("pnNext"), home = $("pnHome");
-  prev.disabled = page === 1;
-  prev.textContent = page === 2 ? "‹ 經文" : "‹ 恩典小品";
+  prev.disabled = page === 0;
+  prev.textContent = page === 1 ? "‹ 首頁" : page === 2 ? "‹ 經文" : "‹ 恩典小品";
   home.disabled = false;
   next.textContent = page === 1 ? "恩典小品 ›" : page === 2 ? "今日格言 ›" : (mode === "seq" ? "下一章 ›" : "下一天 ›");
 }
-$("pnPrev").onclick = () => { if (page > 1) showPage(page - 1, -1); };
+$("pnPrev").onclick = () => { if (page > 0) showPage(page - 1, -1); };
 $("pnNext").onclick = () => {
   if (page === 1) { markRead(); showPage(2, 1); }
   else if (page === 2) showPage(3, 1);
   else step(1);
 };
-$("pnHome").onclick = () => { if (page !== 1) showPage(1, -1); else { window.scrollTo({top:0, behavior:"smooth"}); } };
+$("pnHome").onclick = () => { if (page !== 0) { flushNote(); showPage(0, -1); } };
 
 // ── 經文框：高度貼齊螢幕，正在讀的那一節變色 ──
 const frame = $("frame");
 let padTop = 0, hintDone = false;
 function layoutFrame(keep){
   if (page !== 1) return;
-  $("plan").hidden = true;
   const top = frame.getBoundingClientRect().top + window.scrollY;
   // ★ 調整：經文框盡量拉長，一路延伸到下方按鈕列上面（只留提示字的空間），一次能讀更多節
   const hintH = $("hint").offsetHeight || 18;
@@ -6801,7 +6814,6 @@ function layoutFrame(keep){
   band.style.height = (lh + 4) + "px";
   frame.style.paddingTop = padTop + "px";
   frame.style.paddingBottom = "28px";   // 「參考其他版本」下面留一點空就好
-  $("plan").hidden = false;
   if (!keep) frame.scrollTop = 0;
   markActive();
 }
@@ -7164,7 +7176,7 @@ async function loadJournal(){
 })();
 applyFs();
 render();
-showPage(1, 0);
+showPage(0, 0);
 connect().then(s => { store = s; loadNote(); loadJournal(); });
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
   window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
