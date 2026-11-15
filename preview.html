@@ -356,7 +356,6 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
     <article class="card" id="card">
       <div class="ptitle">今日格言</div>
       <p class="maxim" id="maxim"></p>
-      <div class="foot" id="monthTag"></div>
     </article>
 
     <article class="prayer" id="prayer">
@@ -6645,7 +6644,6 @@ function render(){
   // 格言在逗號處換行，避免字被拆開
   $("maxim").innerHTML = mx ? mx.split(/(?<=，)/).map(x=>`<span class="seg">${esc(x)}</span>`).join("") : `第 ${day} 章第 ${sv} 節的格言還在準備中。`;
   $("maxim").classList.toggle("empty", !mx);
-  $("monthTag").textContent = !mx ? "" : (mode === "seq" ? `改寫自箴言 ${day}:${sv} · 每讀一次這章換下一節` : `${m+1} 月 · 改寫自箴言 ${day}:${sv} · 每月換下一節`);
 
   renderPlan();
   if (mode === "seq") $("nextDay").textContent = `接著讀第 ${day % 31 + 1} 章 ›`;
