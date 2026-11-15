@@ -35,6 +35,8 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0}
+/* ★ 修正：換頁滑入動畫的那一瞬間，畫面不要被撐寬而左右晃動 */
+html{overflow-x:clip}
 body{background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.6}
 .wrap{max-width:560px;margin:0 auto;padding:20px 16px calc(84px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:18px}
 button{font-family:inherit}
@@ -151,7 +153,7 @@ body.night .modesw button.on{color:#10201d}
 .journal{margin:0 0 12px;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
 .journal li{border-left:2px solid var(--gold);padding-left:10px}
 .journal .h{font-size:calc(13px * var(--fs,1));color:var(--muted)}
-.journal .t{font-size:calc(17px * var(--fs,1));white-space:pre-wrap}
+.journal .t{font-size:calc(17px * var(--fs,1));white-space:pre-wrap;overflow-wrap:anywhere} /* ★ 修正：筆記裡貼了很長的網址，自動折行，不把整頁撐寬 */
 .journal button{border:none;background:none;color:var(--accent);padding:0;font-size:calc(12px * var(--fs,1));cursor:pointer;text-decoration:underline}
 details p{font-size:calc(14px * var(--fs,1));color:var(--muted);margin:0 0 12px}
 
@@ -257,7 +259,7 @@ body.night #p3 details{background:#192122}
 .vnotes li{border-left:2px solid var(--gold);padding:2px 0 2px 10px}
 .vnotes .h{font-size:calc(13px * var(--fs,1));color:var(--muted);display:flex;gap:10px;align-items:center}
 .vnotes .h button{border:none;background:none;color:var(--muted);font-size:calc(12px * var(--fs,1));padding:0;text-decoration:underline;cursor:pointer}
-.vnotes .t{font-size:calc(17px * var(--fs,1));line-height:1.85;white-space:pre-wrap}
+.vnotes .t{font-size:calc(17px * var(--fs,1));line-height:1.85;white-space:pre-wrap;overflow-wrap:anywhere}
 .vwrite{align-self:flex-start;border:1px solid var(--gold);background:rgba(180,138,53,.12);color:var(--ink);border-radius:999px;padding:9px 18px;font-size:calc(17px * var(--fs,1));font-weight:500;cursor:pointer;font-family:inherit}
 .vwrite::before{content:"✎ ";color:var(--gold)}
 /* 還沒寫過感動的人，按鈕會一閃一閃，提醒這裡可以按；寫過一次之後就不再閃 */
@@ -2411,13 +2413,15 @@ function currentMode(){ const h = new Date().getHours(); return h>=5&&h<11 ? "mo
 
 const WEEK = "日一二三四五六";
 const now = new Date();
-const todayD = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+let todayD = new Date(now.getFullYear(), now.getMonth(), now.getDate());   // ★ 修正：頁面開著過了半夜，「今天」要能跟著換（見 checkDay）
 let cur = new Date(todayD);
 const $ = id => document.getElementById(id);
 const same = (a,b) => a.getTime() === b.getTime();
 const daysIn = d => new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
 const key = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+// ★ 修正：不是文字的資料也能安全處理，單引號一併跳脫
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const okDate = d => typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d);
 
 // 和合本有兩處把兩節合成一節（23:31–32、26:18–19），TEXT 裡用空字串佔住後面那一節，節號才會和其他譯本一致
 const realVerses = ch => (TEXT[ch] || [""]).map((t,i)=>t===""?0:i+1).filter(Boolean);
@@ -2439,7 +2443,8 @@ const LS = {
 };
 // ── 字體大小：小／中／大／特大，整個工具一起變，記在這台裝置 ──
 function applyFs(){
-  const fs = LS.get("set:fs", 1);
+  let fs = LS.get("set:fs", 1);
+  if (![0.9, 1, 1.15, 1.3].includes(fs)) fs = 1;   // ★ 修正：存的字體大小壞掉時，用「中」
   document.documentElement.style.setProperty("--fs", fs);
   document.querySelectorAll(".fsw button").forEach(b => b.classList.toggle("on", +b.dataset.fs === fs));
 }
@@ -2450,18 +2455,27 @@ document.querySelectorAll(".fsw button").forEach(b => b.onclick = () => {
 
 // ── 讀經方式：依日期（幾號讀第幾章）／依進度（讀完一章接下一章，31 章讀完再從頭） ──
 let mode = LS.get("set:mode", "date");
+if (mode !== "seq") mode = "date";   // ★ 修正：存的讀經方式壞掉時，用「依日期」
 let seq = null;   // 依進度目前讀的章：{ch, v, done, date}
-function seqVerse(ch){ const list = realVerses(ch), n = list.length || 1; return list[LS.get("seq:cnt:"+ch, 0) % n] || 1; }
+// ★ 修正：存在裝置裡的進度資料如果壞掉（或從備份還原了壞的資料），改用預設值，不讓整頁打不開
+function seqRound(){
+  const r = LS.get("seq:round", null);
+  if (!r || typeof r !== "object" || !Array.isArray(r.done)) return {n:1, done:[]};
+  return {n: Math.max(1, parseInt(r.n) || 1), done: [...new Set(r.done.filter(x => Number.isInteger(x) && x >= 1 && x <= 31))]};
+}
+function seqVerse(ch){ const list = realVerses(ch), n = list.length || 1; return list[Math.abs(parseInt(LS.get("seq:cnt:"+ch, 0)) || 0) % n] || 1; }
 function seqOpen(ch){
-  const r = LS.get("seq:round", {n:1, done:[]});
+  const r = seqRound();
   if (r.done.length >= 31){ r.n++; r.done = []; LS.set("seq:round", r); }
   seq = {ch, v: seqVerse(ch), done:false, date:""};
   LS.set("seq:cur", seq);
 }
 function seqLoad(){
   seq = LS.get("seq:cur", null);
-  if (!seq) seqOpen(todayD.getDate());
-  else if (seq.done && seq.date < key(todayD)) seqOpen(seq.ch % 31 + 1);   // 昨天讀完了，今天自動接下一章
+  if (!seq || typeof seq !== "object" || !Number.isInteger(seq.ch) || seq.ch < 1 || seq.ch > 31) return seqOpen(todayD.getDate());   // ★ 修正：資料壞掉就從今天的章開始
+  if (!realVerses(seq.ch).includes(seq.v)) seq.v = seqVerse(seq.ch);
+  seq.done = !!seq.done; seq.date = okDate(seq.date) ? seq.date : "";
+  if (seq.done && seq.date < key(todayD)) seqOpen(seq.ch % 31 + 1);   // 昨天讀完了，今天自動接下一章
 }
 if (mode === "seq") seqLoad();
 const chNow = () => mode === "seq" ? seq.ch : cur.getDate();
@@ -2489,9 +2503,9 @@ function isRead(d){ try { return localStorage.getItem(rdKey(d)) === "1"; } catch
 function markRead(){
   if (mode === "seq"){
     if (seq.done) return;
-    seq.done = true; seq.date = key(todayD); LS.set("seq:cur", seq);
-    LS.set("seq:cnt:"+seq.ch, LS.get("seq:cnt:"+seq.ch, 0) + 1);
-    const r = LS.get("seq:round", {n:1, done:[]});
+    seq.done = true; seq.date = key(new Date()); LS.set("seq:cur", seq);   // ★ 修正：用當下的日期（頁面開著過半夜也正確）
+    LS.set("seq:cnt:"+seq.ch, (Math.abs(parseInt(LS.get("seq:cnt:"+seq.ch, 0)) || 0)) + 1);
+    const r = seqRound();
     if (!r.done.includes(seq.ch)) r.done.push(seq.ch);
     LS.set("seq:round", r);
     renderPlan(); return;
@@ -2555,7 +2569,7 @@ function maximFor(){ const s = setNow(); return s ? s.maxim : null; }
 function render(){
   const day = chNow(), m = cur.getMonth();
   if (mode === "seq"){
-    $("dateText").textContent = `依進度・第 ${LS.get("seq:round",{n:1}).n} 輪`;
+    $("dateText").textContent = `依進度・第 ${seqRound().n} 輪`;
     $("today").hidden = true;
   } else {
     $("dateText").textContent = `${m+1} 月 ${cur.getDate()} 日（${WEEK[cur.getDay()]}）`;
@@ -2614,6 +2628,9 @@ function render(){
     $("allList").innerHTML = done.map(v=>`<li class="${v===sv?'now':''}"><span>${day}:${v}</span>${esc(SETS[day][v].maxim)}</li>`).join("");
   }
 
+  // ★ 修正：換了一天（一章），「只看第 N 章」的字和清單要跟著換
+  $("chipCh").textContent = `只看第 ${day} 章`;
+  if (jFilter === "ch" && store) loadJournal();
   loadNote();
 }
 
@@ -2621,7 +2638,7 @@ function renderPlan(){
   $("mDate").classList.toggle("on", mode === "date");
   $("mSeq").classList.toggle("on", mode === "seq");
   if (mode === "seq"){
-    const r = LS.get("seq:round", {n:1, done:[]});
+    const r = seqRound();
     $("planSum").textContent = `第 ${r.n} 輪讀經進度`;
     const dots = $("dots"); dots.innerHTML = "";
     for (let i=1;i<=31;i++){
@@ -2663,11 +2680,31 @@ function applyMode(){
   document.body.classList.toggle("night", mode === "night");
   $("greet").textContent = md.greet;
   $("storyLabel").textContent = md.story;
+  $("bless").textContent = md.bless;   // ★ 修正：時段換了，禱告下面的祝福語也一起換（原本要重新整理才會換）
   // 晚安時段，默想前面加上「親愛的，」
   if (reflectBase) setReflect((mode === "night" ? "親愛的，" : "") + reflectBase);
 }
+// ★ 修正：頁面一直開著（或加到主畫面後放在背景）過了半夜，原本「今天」會停在昨天。
+// 回到畫面時發現換日了：原本停在「今天」的就換到新的一天；正在看別天的不動，只更新「回到今天」和進度格子。
+function checkDay(canJump){
+  const n = new Date(), t = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+  if (same(t, todayD)) return;
+  canJump = canJump && $("sheet").hidden;
+  if (mode === "seq"){
+    if (!canJump) return;                      // 正在讀就先不動，下次回到畫面再換
+    todayD = t; cur = new Date(t); seqLoad(); render(); showPage(1, 0); return;
+  }
+  const wasToday = same(cur, todayD);
+  todayD = t;
+  if (canJump && wasToday) go(todayD);
+  else { $("today").hidden = same(cur, todayD); renderPlan(); }
+}
 // 時段跨過去（例如 10:59 → 11:00）時自動切換問候與配色
-setInterval(applyMode, 60000);
+setInterval(() => { applyMode(); checkDay(document.hidden); }, 60000);
+// ★ 修正：手機把頁面放到背景時計時器會停，回到畫面時再檢查一次時段與日期；離開畫面時先把沒存的心情故事存起來
+document.addEventListener("visibilitychange", () => { if (document.hidden) flushNote(); else { applyMode(); checkDay(true); } });
+window.addEventListener("pageshow", () => { applyMode(); checkDay(true); });
+window.addEventListener("pagehide", () => { flushNote(); });
 
 function go(d){ cur = new Date(d.getFullYear(), d.getMonth(), d.getDate()); render(); showPage(1, 0); }
 function seqGo(ch){ if (ch !== seq.ch) seqOpen(ch); render(); showPage(1, 0); }
@@ -2775,8 +2812,8 @@ window.addEventListener("resize", () => layoutFrame(true));
 
 // ── 點經文：標記、複製、對照、寫進心情故事 ──
 const hlKey = (ch,v) => `hl:${ch}:${v}`;
-function hlGet(ch,v){ try { return localStorage.getItem(hlKey(ch,v)) || ""; } catch(e){ return ""; } }
-function hlSet(ch,v,c){ try { c ? localStorage.setItem(hlKey(ch,v), c) : localStorage.removeItem(hlKey(ch,v)); } catch(e){} }
+function hlGet(ch,v){ try { const c = localStorage.getItem(hlKey(ch,v)) || ""; return /^[ygbp]$/.test(c) ? c : ""; } catch(e){ return ""; } }   // ★ 修正：只接受四種顏色代號
+function hlSet(ch,v,c){ try { c ? localStorage.setItem(hlKey(ch,v), c) : localStorage.removeItem(hlKey(ch,v)); return true; } catch(e){ return false; } }
 function hlClass(ch,v){ const c = hlGet(ch,v); return c ? " hl-"+c : ""; }
 let picked = null;
 $("vlist").addEventListener("click", e => {
@@ -2796,6 +2833,9 @@ $("vlist").addEventListener("click", e => {
     $("sDeep").textContent = nt.deep;
   }
   $("vnForm").hidden = true; $("vnOpen").hidden = false; $("vnText").value = ""; $("vnSave").disabled = true; $("vnStatus").textContent = "";
+  // ★ 修正：上次寫到一半、還沒按儲存就關掉小視窗的字，再打開同一節時放回來
+  const draft = vnDraft[ch+":"+v];
+  if (draft){ $("vnText").value = draft; $("vnSave").disabled = false; $("vnForm").hidden = false; $("vnOpen").hidden = true; $("vnStatus").textContent = "上次沒存的字還在"; }
   let wrote = false; try { wrote = localStorage.getItem("flag:vnwrote") === "1"; } catch(e){}
   $("vnOpen").classList.toggle("pulse", !wrote);
   vnRender();
@@ -2805,17 +2845,25 @@ $("vlist").addEventListener("click", e => {
   document.querySelectorAll(".cdot").forEach(d => d.classList.toggle("on", !!c && d.dataset.c === c));
   $("sheet").hidden = false;
 });
-function closeSheet(){ $("sheet").hidden = true; if (picked) picked.classList.remove("picked"); }
+const vnDraft = {};   // ★ 修正：不小心點到外面把小視窗關掉時，寫到一半的感動先留著（重新整理前都在）
+function closeSheet(){
+  if (picked && !$("sheet").hidden){
+    const k = picked.dataset.ch+":"+picked.dataset.v, t = $("vnText").value;
+    if (t.trim()){ vnDraft[k] = t; toast("還沒儲存，再點這一節可以繼續寫"); } else delete vnDraft[k];
+  }
+  $("sheet").hidden = true; if (picked) picked.classList.remove("picked");
+}
 $("sClose").onclick = closeSheet;
 $("sheet").addEventListener("click", e => { if (e.target === $("sheet")) closeSheet(); });
 $("sCompare").addEventListener("click", () => setTimeout(closeSheet, 300));
 document.querySelectorAll(".cdot").forEach(d => d.onclick = () => {
   if (!picked) return;
   const ch = +picked.dataset.ch, v = +picked.dataset.v, c = d.dataset.c;
-  hlSet(ch,v,c);
+  const ok = hlSet(ch,v,c);
   const vt = picked.querySelector(".vt");
   vt.className = "vt" + (c ? " hl-"+c : "");
   closeSheet();
+  if (!ok) toast("這台裝置存不進去，重開後標記會不見");   // ★ 修正：存不進去時要讓人知道
 });
 function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(()=>t.classList.remove("show"), 1800); }
 $("sCopy").onclick = async () => {
@@ -2823,26 +2871,38 @@ $("sCopy").onclick = async () => {
   const text = `${TEXT[ch][v-1]}（箴言 ${ch}:${vLabel(ch,v)}，和合本）`;
   try { await navigator.clipboard.writeText(text); }
   catch(e){ const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch(_){} ta.remove(); }
-  closeSheet(); toast("已複製");
+  closeSheet(); if ($("vnText").value.trim() === "") toast("已複製"); else setTimeout(() => toast("已複製"), 1900);
 };
 // ── 每節筆記：寫下這節的感動，自動記日期，存在這台裝置 ──
 const vnKey = (ch,v) => `vn:${ch}:${v}`;
-function vnGet(ch,v){ try { return JSON.parse(localStorage.getItem(vnKey(ch,v))) || []; } catch(e){ return []; } }
+// ★ 修正：筆記資料只留格式正確的，日期、時間戳都整理過（壞掉的一筆不會拖垮全部，也擋掉備份檔裡夾帶的程式碼）
+function vnClean(arr){
+  if (!Array.isArray(arr)) return [];
+  return arr.filter(n => n && typeof n === "object" && typeof n.text === "string" && n.text.trim()).map(n => {
+    const ts = Number.isFinite(+n.ts) && +n.ts > 0 ? +n.ts : 0;
+    return { date: okDate(n.date) ? n.date : (ts ? key(new Date(ts)) : ""), text: n.text, ts };
+  });
+}
+function vnGet(ch,v){ try { return vnClean(JSON.parse(localStorage.getItem(vnKey(ch,v)))); } catch(e){ return []; } }
 function vnPut(ch,v,arr){ try { arr.length ? localStorage.setItem(vnKey(ch,v), JSON.stringify(arr)) : localStorage.removeItem(vnKey(ch,v)); return true; } catch(e){ return false; } }
 function vnAll(){
   const out = [];
-  try { for (let i=0;i<localStorage.length;i++){ const k = localStorage.key(i); if (!k.startsWith("vn:")) continue;
-    const [,ch,v] = k.split(":"); (JSON.parse(localStorage.getItem(k))||[]).forEach(n => out.push({...n, ch:+ch, v:+v})); } } catch(e){}
+  try { for (let i=0;i<localStorage.length;i++){ const k = localStorage.key(i); if (!/^vn:\d+:\d+$/.test(k)) continue;
+    const [,ch,v] = k.split(":"); vnGet(+ch,+v).forEach(n => out.push({...n, ch:+ch, v:+v})); } } catch(e){}   // ★ 修正：一則壞掉不影響其他則
   return out;
 }
-const fmtDate = d => { const [y,m,dd] = d.split("-"); return `${y}/${+m}/${+dd}`; };
+const fmtDate = d => { if (!okDate(d)) return "日期不明"; const [y,m,dd] = d.split("-"); return `${y}/${+m}/${+dd}`; };   // ★ 修正：沒有日期的舊資料不會讓清單整個空白
 function vnRender(){
   const ch = +picked.dataset.ch, v = +picked.dataset.v, list = vnGet(ch,v);
   $("vnTitle").textContent = list.length ? `我的感動（${list.length}）` : "我的感動";
-  $("vnList").innerHTML = list.slice().reverse().map(n => `<li><div class="h">${fmtDate(n.date)}<button data-ts="${n.ts}">刪除</button></div><div class="t">${esc(n.text)}</div></li>`).join("");
-  $("vnList").querySelectorAll("button[data-ts]").forEach(b => b.onclick = () => {
+  $("vnList").innerHTML = list.map((n,i) => `<li><div class="h">${fmtDate(n.date)}<button data-i="${i}">刪除</button></div><div class="t">${esc(n.text)}</div></li>`).reverse().join("");
+  $("vnList").querySelectorAll("button[data-i]").forEach(b => b.onclick = () => {
     if (!confirm("確定要刪除這則感動嗎？刪除後就找不回來了。")) return;
-    vnPut(ch, v, vnGet(ch,v).filter(n => String(n.ts) !== b.dataset.ts));
+    // ★ 修正：只刪掉按的那一則（原本用時間戳比對，時間戳相同或空白的會被一起刪掉）
+    const arr = vnGet(ch,v), n = list[+b.dataset.i];
+    const at = arr.findIndex(x => x.ts === n.ts && x.text === n.text && x.date === n.date);
+    if (at >= 0) arr.splice(at, 1);
+    if (!vnPut(ch, v, arr)) toast("這台裝置存不進去");
     vnRender(); markNoted(); loadJournal();
   });
 }
@@ -2856,7 +2916,7 @@ $("vnSave").onclick = () => {
   const ch = +picked.dataset.ch, v = +picked.dataset.v;
   const arr = vnGet(ch,v); arr.push({ date: key(new Date()), text, ts: Date.now() });
   if (!vnPut(ch,v,arr)){ $("vnStatus").textContent = "存不進去，請先把文字複製起來"; return; }
-  $("vnText").value = ""; $("vnSave").disabled = true;
+  $("vnText").value = ""; $("vnSave").disabled = true; delete vnDraft[ch+":"+v];
   $("vnForm").hidden = true; $("vnOpen").hidden = false;
   try { localStorage.setItem("flag:vnwrote", "1"); } catch(e){}
   $("vnOpen").classList.remove("pulse");
@@ -2875,8 +2935,10 @@ const local = {
   set: async (k,o) => { localStorage.setItem("note:"+k, JSON.stringify(o)); },
   all: async () => {
     const out = [];
-    try { for (let i=0;i<localStorage.length;i++){ const k = localStorage.key(i); if (k.startsWith("note:")) out.push(JSON.parse(localStorage.getItem(k))); } } catch(e){}
-    return out.filter(Boolean).sort((a,b)=> a.date < b.date ? 1 : -1);
+    // ★ 修正：一則壞掉不影響其他則；沒有日期的用存檔名稱上的日期
+    try { for (let i=0;i<localStorage.length;i++){ const k = localStorage.key(i); if (!k.startsWith("note:")) continue;
+      try { const o = JSON.parse(localStorage.getItem(k)); if (o && typeof o === "object" && typeof o.text === "string"){ if (!okDate(o.date)) o.date = k.slice(5); out.push(o); } } catch(_){} } } catch(e){}
+    return out.sort((a,b)=> a.date < b.date ? 1 : -1);
   },
   where: "這台裝置"
 };
@@ -2898,8 +2960,22 @@ async function connect(){
   } catch(e){ return local; }
 }
 
+// ★ 修正：心情故事寫了還沒按「儲存」就換到別天、切換讀經方式或離開畫面，原本整段會不見；現在會先自動存到它原本那一天
+let noteKey = "", noteMeta = null;
+async function flushNote(){
+  if (!store || !noteKey || note.disabled || saving || note.value === loadedText) return;
+  const k = noteKey, text = note.value, o = { date:k, chapter:noteMeta.chapter, maxim:noteMeta.maxim, text, updatedAt:new Date().toISOString() };
+  loadedText = text;
+  let ok = true;
+  try { await store.set(k, o); } catch(e){ try { if (store === local) throw e; await local.set(k, o); } catch(_){ ok = false; } }
+  if (ok){ toast("心情故事已自動儲存"); loadJournal(); }
+  else toast("心情故事存不進去");
+  if (k === noteKey && note.value === text){ statusEl.textContent = ok ? "已自動儲存" : "存不進去，請先把文字複製起來"; saveBtn.disabled = ok; if (!ok) loadedText = ""; }
+}
 async function loadNote(){
+  if (store && noteKey && note.value !== loadedText) await flushNote();
   const k = key(cur);
+  noteKey = k; noteMeta = { chapter: chNow(), maxim: maximFor() || "" };
   note.value = ""; loadedText = "";
   saveBtn.disabled = true;
   if (!store){ note.disabled = true; statusEl.textContent = "載入中…"; return; }
@@ -2939,7 +3015,37 @@ saveBtn.onclick = async () => {
 
 // ── 筆記備份／還原 ──
 const BKP=/^(vn:|hl:|note:|rd:|seq:|set:|flag:|mig:)/;
-$("bkOut").onclick=()=>{
+// ★ 修正：還原改成「合併」而且先檢查內容——
+//   同一節的感動：備份裡的和手機上現有的都留（原本會整節蓋掉，備份之後才寫的會不見）
+//   同一天的心情故事：留比較新的那一份；顏色標記、進度、設定：用備份檔的
+//   格式不對的資料略過不寫（原本會照樣寫進去，把好的筆記蓋成壞的）
+function bkCheck(k,v){
+  if (typeof v!=="string" || !BKP.test(k)) return null;
+  try {
+    const mine = localStorage.getItem(k);
+    if (/^vn:\d{1,2}:\d{1,3}$/.test(k)){
+      const inc = vnClean(JSON.parse(v)); if (!inc.length) return null;
+      let cur = []; try { cur = vnClean(JSON.parse(mine)); } catch(_){}
+      const seen = new Set(cur.map(n => n.ts+"|"+n.date+"|"+n.text));
+      inc.forEach(n => { const id = n.ts+"|"+n.date+"|"+n.text; if (!seen.has(id)){ seen.add(id); cur.push(n); } });
+      cur.sort((a,b) => a.date === b.date ? a.ts - b.ts : (a.date < b.date ? -1 : 1));
+      return JSON.stringify(cur);
+    }
+    if (/^note:\d{4}-\d{2}-\d{2}$/.test(k)){
+      const o = JSON.parse(v); if (!o || typeof o !== "object" || typeof o.text !== "string") return null;
+      let m = null; try { m = JSON.parse(mine); } catch(_){}
+      if (m && typeof m === "object" && typeof m.text === "string" && m.text.trim() && String(m.updatedAt||"") > String(o.updatedAt||"")) return mine;
+      return v;
+    }
+    if (/^hl:\d{1,2}:\d{1,3}$/.test(k)) return /^[ygbp]$/.test(v) ? v : null;
+    if (/^rd:\d{4}-\d{2}-\d{2}$/.test(k)) return v === "1" ? v : null;
+    if (/^(flag|mig):/.test(k)) return v === "1" ? v : null;
+    if (/^(seq|set):/.test(k)){ JSON.parse(v); return v; }
+  } catch(_){}
+  return null;
+}
+$("bkOut").onclick=async()=>{
+  await flushNote();   // ★ 修正：還沒按儲存的心情故事也一起備份
   const data={app:"bible-daily",at:new Date().toISOString(),items:{}};
   try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(BKP.test(k)) data.items[k]=localStorage.getItem(k); } }catch(e){}
   const n=Object.keys(data.items).length;
@@ -2954,15 +3060,33 @@ $("bkIn").onclick=()=>$("bkFile").click();
 $("bkFile").onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
   const r=new FileReader();
-  r.onload=()=>{ try{
-      const d=JSON.parse(r.result); if(!d||d.app!=="bible-daily"||!d.items) throw 0;
-      let n=0; for(const [k,v] of Object.entries(d.items)){ if(BKP.test(k)&&typeof v==="string"){ localStorage.setItem(k,v); n++; } }
-      toast(`已還原 ${n} 筆資料`); setTimeout(()=>location.reload(),900);
-    }catch(_){ toast("這個檔案不是讀經筆記的備份"); }
+  r.onload=()=>{
     e.target.value="";
+    let d=null; try{ d=JSON.parse(r.result); }catch(_){}
+    if(!d||typeof d!=="object"||d.app!=="bible-daily"||!d.items||typeof d.items!=="object"){ toast("這個檔案不是讀經筆記的備份"); return; }
+    let n=0, full=false;
+    for(const [k,v] of Object.entries(d.items)){
+      const out=bkCheck(k,v); if(out===null) continue;
+      try{ if(localStorage.getItem(k)!==out) localStorage.setItem(k,out); n++; }catch(_){ full=true; break; }   // ★ 修正：空間滿了要說清楚，不再誤報「不是備份檔」
+    }
+    if(!n&&!full){ toast("備份檔裡沒有可以還原的資料"); return; }
+    toast(full?`空間不夠，只還原了 ${n} 筆`:`已還原 ${n} 筆資料`);
+    note.value=loadedText;   // 重新整理前不再自動存檔，以還原的結果為準
+    setTimeout(()=>location.reload(),900);
   };
+  r.onerror=()=>{ e.target.value=""; toast("檔案讀不到，請再試一次"); };
   r.readAsText(f);
 };
+// ★ 修正：經節感動的「打開這天」要打開有那一章的日子。
+// 原本一律打開「寫的那一天」，提前讀或補讀時寫的感動會被帶到別章（例如 15 號提前讀第 20 章寫的，會打開第 15 章）
+function dayForVerse(dstr, ch, v){
+  const base = okDate(dstr) ? new Date(...dstr.split("-").map((x,j) => j === 1 ? x-1 : +x)) : new Date(todayD);
+  if (base.getDate() === ch || makeup(base).some(x => x.ch === ch && x.v === v)) return base;
+  const y = base.getFullYear(), m = base.getMonth();
+  if (ch <= daysIn(base)) return new Date(y, m, ch);
+  for (let d = daysIn(base); d >= 1; d--){ const t = new Date(y, m, d); if (makeup(t).some(x => x.ch === ch && x.v === v)) return t; }   // 這個月沒有這一天：找月底補讀的那天
+  return base;
+}
 let jFilter = "all";
 document.querySelectorAll(".chip").forEach(c => c.onclick = () => {
   jFilter = c.dataset.f;
@@ -2974,20 +3098,24 @@ async function loadJournal(){
   $("chipCh").textContent = `只看第 ${chNow()} 章`;
   let days = [];
   try { if (store) days = (await store.all()).filter(o => o && o.text && o.text.trim()); } catch(e){}
+  // ★ 修正：日期、章節先整理成安全的格式再放進畫面
+  const chOk = c => Number.isInteger(c) && c >= 1 && c <= 31;
   let items = [
-    ...days.map(o => ({ kind:"day", date:o.date, ch:o.chapter, text:o.text, ts: Date.parse(o.updatedAt||o.date) || 0 })),
+    ...days.map(o => ({ kind:"day", date: okDate(o.date) ? o.date : "", ch: chOk(+o.chapter) ? +o.chapter : 0, text:String(o.text), ts: Date.parse(o.updatedAt||o.date) || 0 })),
     ...vnAll().map(n => ({ kind:"verse", date:n.date, ch:n.ch, v:n.v, text:n.text, ts:n.ts }))
   ];
   if (jFilter === "ch") items = items.filter(o => o.ch === chNow());
   items.sort((a,b) => a.date === b.date ? b.ts - a.ts : (a.date < b.date ? 1 : -1));
   if (!items.length){ ul.innerHTML = `<li><div class="h">${jFilter === "ch" ? "這一章還沒有寫過。" : "還沒有寫過。讀經時點一下經文，或在上面寫下今天的心情故事，都會出現在這裡。"}</div></li>`; return; }
-  ul.innerHTML = items.map(o => {
-    const where = o.kind === "verse" ? `箴言 ${o.ch}:${o.v}` : `箴言 ${o.ch} 章 <span class="tag2">心情故事</span>`;
-    return `<li><div class="h">${fmtDate(o.date)} · ${where} · <button data-d="${o.date}" data-c="${o.ch}">${mode === "seq" ? "打開這章" : "打開這天"}</button></div><div class="t">${esc(o.text)}</div></li>`;
+  ul.innerHTML = items.map((o,i) => {
+    const where = o.kind === "verse" ? `箴言 ${+o.ch}:${esc(chOk(o.ch) ? vLabel(o.ch,o.v) : o.v)}` : `${o.ch ? `箴言 ${o.ch} 章 ` : ""}<span class="tag2">心情故事</span>`;
+    const can = mode === "seq" ? chOk(o.ch) : (okDate(o.date) || (o.kind === "verse" && chOk(o.ch)));
+    return `<li><div class="h">${fmtDate(o.date)} · ${where}${can ? ` · <button data-i="${i}">${mode === "seq" ? "打開這章" : "打開這天"}</button>` : ""}</div><div class="t">${esc(o.text)}</div></li>`;
   }).join("");
-  ul.querySelectorAll("button[data-d]").forEach(b => b.onclick = () => {
-    if (mode === "seq") return seqGo(+b.dataset.c);
-    const [y,mo,d] = b.dataset.d.split("-").map(Number); go(new Date(y,mo-1,d));
+  ul.querySelectorAll("button[data-i]").forEach(b => b.onclick = () => {
+    const o = items[+b.dataset.i];
+    if (mode === "seq") return seqGo(o.ch);
+    go(o.kind === "verse" ? dayForVerse(o.date, o.ch, o.v) : new Date(...o.date.split("-").map((x,j) => j === 1 ? x-1 : +x)));
   });
 }
 
