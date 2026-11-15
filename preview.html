@@ -6667,7 +6667,7 @@ function render(){
 }
 
 function renderHome(){
-  $("startBtn").textContent = mode === "seq" ? `接著讀箴言第 ${seq.ch} 章 ›` : `今天讀箴言第 ${todayD.getDate()} 章 ›`;
+  $("startBtn").textContent = mode === "seq" ? `今日進度　箴言${seq.ch}章` : `今日進度　箴言${todayD.getDate()}章`;
 }
 $("startBtn").onclick = () => { if (mode === "seq"){ render(); showPage(1, 0); } else go(todayD); };
 function renderPlan(){
