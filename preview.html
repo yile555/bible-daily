@@ -162,6 +162,7 @@ details p{font-size:calc(14px * var(--fs,1));color:var(--muted);margin:0 0 12px}
 /* ── 分頁 ── */
 .page[hidden]{display:none}
 .hometitle{margin:6px 0 0;text-align:center;font-family:var(--font-display);font-size:calc(28px * var(--fs,1));letter-spacing:.2em;color:var(--accent)}
+.hometitle .tbook{margin-right:.5em}
 .datebar[hidden]{display:none}
 .page{display:flex;flex-direction:column;gap:18px}
 @media (prefers-reduced-motion:no-preference){
@@ -322,7 +323,7 @@ body.night .linebar{background:#3a3220;border-color:#6b5a2a;color:#f3e2b0}
   </div>
 
   <section class="page home" id="p0">
-    <h1 class="hometitle">箴言讀經日常</h1>
+    <h1 class="hometitle"><span class="tbook">箴言</span>讀經日常</h1>
     <button class="reveal" id="startBtn"></button>
     <div class="plan" id="plan">
       <div class="ph"><b id="planSum">本月讀經進度</b><span class="pc" id="planCount"></span></div>
