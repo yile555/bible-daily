@@ -6513,7 +6513,10 @@ function seqVerse(ch){ const list = realVerses(ch), n = list.length || 1; return
 function seqOpen(ch){
   const r = seqRound();
   if (r.done.length >= 31){ r.n++; r.done = []; LS.set("seq:round", r); }
-  seq = {ch, v: seqVerse(ch), done:false, date:""};
+  // 今天已經讀完這一章，跳去別章再回來：還是同一則故事（不要換成下一節）
+  const last = LS.get("seq:last:"+ch, null);
+  if (last && last.date === key(new Date()) && realVerses(ch).includes(last.v)) seq = {ch, v:last.v, done:true, date:last.date};
+  else seq = {ch, v: seqVerse(ch), done:false, date:""};
   LS.set("seq:cur", seq);
 }
 function seqLoad(){
@@ -6551,6 +6554,7 @@ function markRead(){
     if (seq.done) return;
     seq.done = true; seq.date = key(new Date()); LS.set("seq:cur", seq);   // ★ 修正：用當下的日期（頁面開著過半夜也正確）
     LS.set("seq:cnt:"+seq.ch, (Math.abs(parseInt(LS.get("seq:cnt:"+seq.ch, 0)) || 0)) + 1);
+    LS.set("seq:last:"+seq.ch, {v:seq.v, date:seq.date});
     const r = seqRound();
     if (!r.done.includes(seq.ch)) r.done.push(seq.ch);
     LS.set("seq:round", r);
