@@ -294,13 +294,15 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
 .toast.show{opacity:1}
 .linebar{display:block;margin:0 0 14px;padding:12px 14px;border-radius:14px;background:#fff7e0;border:1px solid #e6c56a;color:#5a4400;font-size:calc(15px * var(--fs,1));line-height:1.6;text-align:center}
 .linebar[hidden]{display:none}
+.linebar a{animation:lbPulse 1.6s ease-in-out infinite}
+@keyframes lbPulse{0%,100%{box-shadow:0 0 0 0 rgba(45,107,96,.55);filter:brightness(1)}50%{box-shadow:0 0 0 8px rgba(45,107,96,0);filter:brightness(1.25)}}
 .linebar a{display:block;margin-top:10px;background:var(--accent);color:#fff;text-decoration:none;padding:12px;border-radius:12px;font-weight:700;font-size:calc(17px * var(--fs,1))}
 body.night .linebar{background:#3a3220;border-color:#6b5a2a;color:#f3e2b0}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="linebar" id="lineBar" hidden><span>這裡可以照常讀經。<br>想把心得好好存下來，請按下面的按鈕：</span><a id="lineOpen" href="#">換到手機瀏覽器 ›</a></div>
+  <div class="linebar" id="lineBar" hidden><span>這裡可以照常讀經。<br>若需把心得保存下來，請按下面的按鈕：</span><a id="lineOpen" href="#">換到手機瀏覽器 ›</a></div>
 
   <div class="greet" id="greet"></div>
   <div class="datebar" id="datebar">
