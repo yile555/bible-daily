@@ -43,6 +43,9 @@ let N=grab('NOTES');
 for(const f of args.filter(a=>a.includes('/notes/')))
   for(const x of parseNotes(f)){ (N.obj[x.ch]=N.obj[x.ch]||{})[x.v]=x.n; }
 h=h.slice(0,N.start)+JSON.stringify(sortObj(N.obj),null,1)+h.slice(N.end);
+// HARD（難字注音與小解釋）
+if(h.indexOf('const HARD = ')<0) h=h.replace('// ── 每節註釋：白話＋原文＋細讀 ──','const HARD = {};\n// ── 每節註釋：白話＋原文＋細讀 ──');
+const HD=grab('HARD'); h=h.slice(0,HD.start)+JSON.stringify(JSON.parse(fs.readFileSync('/home/claude/bible-daily/src/map/hard.json','utf8')))+h.slice(HD.end);
 fs.writeFileSync(P,h);
 console.log('SETS chapters',Object.keys(S.obj).length,'sets',Object.values(S.obj).reduce((a,o)=>a+Object.keys(o).length,0));
 console.log('NOTES chapters',Object.keys(N.obj).join(','),'verses',Object.values(N.obj).reduce((a,o)=>a+Object.keys(o).length,0));
