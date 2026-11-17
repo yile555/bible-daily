@@ -1,6 +1,6 @@
 {
-  "name": "箴言書的讀經日常",
-  "short_name": "讀經日常",
+  "name": "箴言讀經日常",
+  "short_name": "箴言讀經日常",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#e7ece6",

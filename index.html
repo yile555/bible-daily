@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>箴言書的讀經日常</title>
+<title>箴言讀經日常</title>
 <meta name="description" content="每天一章箴言，一則恩典小品、一段默想、一段禱告。">
 <meta name="theme-color" content="#2f6b62">
 <meta property="og:type" content="website">
-<meta property="og:title" content="箴言書的讀經日常">
+<meta property="og:title" content="箴言讀經日常">
 <meta property="og:description" content="每天一章箴言，一則恩典小品、一段默想、一段禱告。">
 <meta property="og:image" content="https://yile555.github.io/bible-daily/og.png">
 <meta property="og:url" content="https://yile555.github.io/bible-daily/">
@@ -45,7 +45,7 @@ button:focus-visible,a:focus-visible,textarea:focus-visible,summary:focus-visibl
 .greet{text-align:center;font-family:var(--font-display);font-size:calc(15px * var(--fs,1));letter-spacing:.3em;color:var(--accent);margin-bottom:-6px}
 .prayer{background:transparent;border:1px dashed var(--gold);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
 .prayer[hidden]{display:none}
-.card .ptitle,.prayer .ptitle{font-size:calc(14px * var(--fs,1));color:var(--muted);letter-spacing:.1em}
+.card .ptitle,.prayer .ptitle{font-size:calc(16px * var(--fs,1));color:var(--accent);font-weight:700;letter-spacing:.12em}
 .prayer p{font-family:var(--font-display);font-size:calc(19px * var(--fs,1));line-height:1.95;margin:0}
 .prayer .bless{font-size:calc(16px * var(--fs,1));color:var(--accent);font-weight:500;padding-top:6px;border-top:1px solid var(--line)}
 @media (prefers-reduced-motion:no-preference){ .prayer.show{animation:rise .6s ease-out} }
@@ -78,7 +78,7 @@ body.night .dot.done{background:#24413b;border-color:#2f5a51}
 
 .story{position:relative;background:var(--paper);border-radius:14px;padding:24px 22px 20px;border:1px solid var(--line);display:flex;flex-direction:column;gap:14px}
 .story[hidden]{display:none}
-.story .tag{display:flex;align-items:center;gap:8px;font-size:calc(14px * var(--fs,1));color:var(--muted)}
+.story .tag{display:flex;align-items:center;gap:8px;font-size:calc(16px * var(--fs,1));color:var(--accent);font-weight:700;letter-spacing:.12em}
 .story p{font-family:var(--font-display);font-size:calc(20px * var(--fs,1));line-height:1.95;margin:0}
 .story .reflect{border-top:1px dashed var(--gold);padding-top:12px;display:flex;flex-direction:column;gap:4px}
 .story .reflect[hidden]{display:none}
@@ -304,7 +304,8 @@ body.night .linebar{background:#3a3220;border-color:#6b5a2a;color:#f3e2b0}
 .fbmsg{display:block;width:100%;box-sizing:border-box;min-height:110px;margin:6px 0 10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-size:calc(16px * var(--fs,1));line-height:1.6;resize:vertical}
 .fbname{display:block;width:100%;box-sizing:border-box;margin:0 0 10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-size:calc(16px * var(--fs,1))}
 .fbsend{display:block;width:100%;margin-bottom:6px}
-.fbnote{font-size:calc(14px * var(--fs,1));color:var(--muted)}
+.fbnote{font-size:calc(14px * var(--fs,1));color:#c4741f}
+body.night .fbnote{color:#e3a35a}
 .fbstat{margin:6px 0 12px;font-size:calc(15px * var(--fs,1));color:var(--accent);min-height:1em}
 ruby{ruby-position:over}
 rt{font-size:.42em;color:var(--muted);letter-spacing:0;font-family:var(--font-body,sans-serif)}
@@ -346,7 +347,7 @@ rt{font-size:.42em;color:var(--muted);letter-spacing:0;font-family:var(--font-bo
     </details>
     <details class="help" id="fbBox">
       <summary>有誤之處，歡迎指教與建議</summary>
-      <p class="tipline">您的批評與鼓勵，都是「箴言書的讀經日常」成長的動力。</p>
+      <p class="tipline">您的批評與鼓勵，都是「箴言讀經日常」成長的動力。</p>
       <p class="tipline fbnote">您的留言只提供改善工具使用，不會用在工具以外。</p>
       <textarea id="fbMsg" class="fbmsg" placeholder="例如：11 月 17 日的故事有錯字……"></textarea>
       <input type="checkbox" id="fbBot" hidden tabindex="-1" autocomplete="off">
@@ -6785,6 +6786,7 @@ function showPage(n, dir){
   if (dir) { void el.offsetWidth; el.classList.add(dir > 0 ? "in-next" : "in-back"); }
   window.scrollTo({top:0});
   $("datebar").hidden = n === 0;
+  if (n === 0) $("fbBox").open = false;   // 回首頁時，留言區收起來
   document.querySelector(".pnav").hidden = n === 0;
   renderNav();
   if (n === 1) requestAnimationFrame(() => layoutFrame(dir < 0));
