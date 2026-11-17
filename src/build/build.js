@@ -1,6 +1,6 @@
-// 把故事組、註釋、節號修正寫進 preview.html
+// 把故事組、註釋、節號修正寫進 index.html
 const fs=require('fs');
-const P='/home/claude/bible-daily/preview.html';
+const P='/home/claude/bible-daily/index.html';
 let h=fs.readFileSync(P,'utf8');
 function grab(name){ // 取出 const NAME = {...}; 的範圍
   const s=h.indexOf(`const ${name} = `); let i=h.indexOf('{',s), d=0, j=i, q=null;

@@ -1,6 +1,6 @@
 // 離線閱讀：打開過一次之後，沒有網路也能讀。
 // 有網路時一律先拿最新版（所以更新內容不用等），沒網路才用存起來的那一份。
-const CACHE = 'bible-daily-v1';
+const CACHE = 'bible-daily-v2';
 const CORE = [
   './',
   './index.html',
@@ -54,7 +54,7 @@ self.addEventListener('fetch', e => {
     }).catch(() =>
       caches.match(req, {ignoreSearch: true}).then(hit => {
         if (hit) return hit;
-        if (req.mode === 'navigate') return caches.match('./preview.html').then(p => p || caches.match('./index.html'));
+        if (req.mode === 'navigate') return caches.match('./index.html').then(p => p || caches.match('./'));
         return Response.error();
       })
     )
