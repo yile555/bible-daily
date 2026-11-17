@@ -18,7 +18,7 @@ function parseStories(file){
     const story=body.split('**默想**')[0].trim();
     const g=k=>{const r=b.match(new RegExp('\\*\\*'+k+'\\*\\*：(.*)'));return r[1].trim();};
     const pr=g('禱告'); if(pr.startsWith('親愛的')||pr.includes('阿門')||!pr.endsWith('。')) throw 'prayer '+m[0];
-    out.push({ch:m[1],v:m[2],set:{fruit:m[3],story,reflect:(b.split('**默想**：')[1]||'').split('**格言**')[0].trim().split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean).join('\n'),maxim:g('格言'),prayer:pr}});
+    out.push({ch:m[1],v:m[2],set:{fruit:m[3],story,reflect:(b.split('**默想**：')[1]||'').split('**格言**')[0].trim().split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean).join('\n'),prayer:pr}});
   }
   return out;
 }
@@ -36,6 +36,8 @@ const args=process.argv.slice(2);
 let S=grab('SETS');
 for(const f of args.filter(a=>a.includes('/stories/')))
   for(const x of parseStories(f)){ (S.obj[x.ch]=S.obj[x.ch]||{})[x.v]=x.set; }
+// 格言不放進網頁（2026-11-17 他定；原稿的格言行留給格言庫）
+for(const c in S.obj) for(const v in S.obj[c]) delete S.obj[c][v].maxim;
 const sortObj=o=>Object.fromEntries(Object.keys(o).sort((a,b)=>a-b).map(k=>[k,typeof o[k]==='object'&&!('story' in o[k])&&!('plain' in o[k])?sortObj(o[k]):o[k]]));
 h=h.slice(0,S.start)+JSON.stringify(sortObj(S.obj),null,1)+h.slice(S.end);
 // NOTES
