@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>箴言書的讀經日常</title>
-<meta name="description" content="每天一章箴言，一則恩典小品、一句格言、一段禱告。">
+<meta name="description" content="每天一章箴言，一則恩典小品、一段默想、一段禱告。">
 <meta name="theme-color" content="#2f6b62">
 <meta property="og:type" content="website">
 <meta property="og:title" content="箴言書的讀經日常">
-<meta property="og:description" content="每天一章箴言，一則恩典小品、一句格言、一段禱告。">
+<meta property="og:description" content="每天一章箴言，一則恩典小品、一段默想、一段禱告。">
 <meta property="og:image" content="https://yile555.github.io/bible-daily/og.png">
 <meta property="og:url" content="https://yile555.github.io/bible-daily/preview.html">
 <link rel="icon" href="icon-192.png">
@@ -21,7 +21,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* 晨光讀經：灰綠底、紙白頁、深墨字、松綠主色、一條金線。由上往下：經文 → 按鈕 → 格言卡 → 心得 */
+  /* 晨光讀經：灰綠底、紙白頁、深墨字、松綠主色、一條金線。由上往下：經文 → 恩典小品 → 禱告 → 心得 */
   --bg:#e7ece6;
   --paper:#fbfaf5;
   --ink:#1f2a2b;
@@ -245,7 +245,7 @@ body.night .wbox .wn{color:#8cc0ef}
 .cdot.y{background:#f5d65a}.cdot.g{background:#82d696}.cdot.b{background:#78c8f0}.cdot.p{background:#f2a0c3}
 .cdot.x{background:var(--bg);color:var(--muted);font-size:calc(12px * var(--fs,1));width:auto;padding:0 12px;border-radius:999px;border-color:var(--line)}
 .sact{display:block;width:100%;text-align:left;border:none;border-top:1px solid var(--line);background:none;color:var(--ink);font-size:calc(17px * var(--fs,1));padding:14px 2px;cursor:pointer;text-decoration:none;font-family:inherit}
-/* ── 格言頁：心得輸入框白色，其他區塊用不同底色區分 ── */
+/* ── 禱告頁：心得輸入框白色，其他區塊用不同底色區分 ── */
 #p3 .card{background:#f6efdf}
 .notes textarea{background:#fff;border-color:#cdd6cf;box-shadow:0 1px 3px rgba(31,42,43,.06)}
 #p3 details{background:#dce4de;border-color:transparent}
@@ -349,15 +349,10 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
       <p id="storyText"></p>
       <div class="reflect" id="reflect" hidden><span class="rt">默想</span><p id="reflectText"></p></div>
     </article>
-    <button class="reveal second" id="toMaxim">今日格言 ›</button>
+    <button class="reveal second" id="toMaxim">今日禱告 ›</button>
   </section>
 
   <section class="page" id="p3" hidden>
-    <article class="card" id="card">
-      <div class="ptitle">今日格言</div>
-      <p class="maxim" id="maxim"></p>
-    </article>
-
     <article class="prayer" id="prayer">
       <div class="ptitle">今日禱告</div>
       <p id="prayerText"></p>
@@ -381,11 +376,6 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
     <ul class="journal" id="journal"></ul>
     <div class="bk"><button id="bkOut">備份我的筆記</button><button id="bkIn">從備份還原</button><input type="file" id="bkFile" accept=".json,application/json" hidden></div>
     <p class="bknote">筆記存在這支手機的瀏覽器裡。換手機、清除瀏覽器之前，先按「備份我的筆記」。</p>
-  </details>
-
-  <details id="allBox">
-    <summary id="allSum">這一章的 12 句格言</summary>
-    <ol class="list" id="allList"></ol>
   </details>
 
   </section>
@@ -6640,22 +6630,10 @@ function render(){
   const md = MODES[currentMode()];
   $("prayerText").textContent = st ? `${md.open}${st.prayer}奉耶穌基督的名禱告，阿門。` : `${md.open}謝謝祢今天又讓我讀祢的話，願祢的話留在我心裡。奉耶穌基督的名禱告，阿門。`;
   $("bless").textContent = md.bless;
-  const mx = maximFor();
-  // 格言在逗號處換行，避免字被拆開
-  $("maxim").innerHTML = mx ? mx.split(/(?<=，)/).map(x=>`<span class="seg">${esc(x)}</span>`).join("") : `第 ${day} 章第 ${sv} 節的格言還在準備中。`;
-  $("maxim").classList.toggle("empty", !mx);
 
   renderPlan();
   if (mode === "seq") $("nextDay").textContent = `接著讀第 ${day % 31 + 1} 章 ›`;
   else { const nd = new Date(cur.getFullYear(), m, cur.getDate()+1); $("nextDay").textContent = `接著讀 ${nd.getMonth()+1} 月 ${nd.getDate()} 日 ›`; }
-
-  // 本章已寫好的格言（依節排列）
-  const done = SETS[day] ? Object.keys(SETS[day]).map(Number).sort((a,b)=>a-b) : [];
-  $("allBox").hidden = !done.length;
-  if (done.length){
-    $("allSum").textContent = `第 ${day} 章的格言（${done.length} 句）`;
-    $("allList").innerHTML = done.map(v=>`<li class="${v===sv?'now':''}"><span>${day}:${v}</span>${esc(SETS[day][v].maxim)}</li>`).join("");
-  }
 
   // ★ 修正：換了一天（一章），「只看第 N 章」的字和清單要跟著換
   $("chipCh").textContent = `只看第 ${day} 章`;
@@ -6757,7 +6735,7 @@ document.querySelectorAll(".modesw button[data-m]").forEach(b => b.onclick = () 
   toast(mode === "seq" ? "已改成依進度" : "已改成依日期");
 });
 $("today").onclick = () => go(todayD);
-// ── 分頁：經文 → 恩典小品 → 今日格言 ──
+// ── 分頁：經文 → 恩典小品 → 今日禱告 ──
 let page = 0;
 function showPage(n, dir){
   page = n;
@@ -6783,7 +6761,7 @@ function renderNav(){
   prev.disabled = page === 0;
   prev.textContent = page === 1 ? "‹ 首頁" : page === 2 ? "‹ 經文" : "‹ 恩典小品";
   home.disabled = false;
-  next.textContent = page === 1 ? "恩典小品 ›" : page === 2 ? "今日格言 ›" : (mode === "seq" ? "下一章 ›" : "下一天 ›");
+  next.textContent = page === 1 ? "恩典小品 ›" : page === 2 ? "今日禱告 ›" : (mode === "seq" ? "下一章 ›" : "下一天 ›");
 }
 $("pnPrev").onclick = () => { if (page > 0) showPage(page - 1, -1); };
 $("pnNext").onclick = () => {
