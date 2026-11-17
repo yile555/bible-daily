@@ -349,12 +349,12 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
       <p id="storyText"></p>
       <div class="reflect" id="reflect" hidden><span class="rt">默想</span><p id="reflectText"></p></div>
     </article>
-    <button class="reveal second" id="toMaxim">今日禱告 ›</button>
+    <button class="reveal second" id="toMaxim">我們一起禱告 ›</button>
   </section>
 
   <section class="page" id="p3" hidden>
     <article class="prayer" id="prayer">
-      <div class="ptitle">今日禱告</div>
+      <div class="ptitle">我們一起禱告</div>
       <p id="prayerText"></p>
       <div class="bless" id="bless"></div>
     </article>
@@ -6735,7 +6735,7 @@ document.querySelectorAll(".modesw button[data-m]").forEach(b => b.onclick = () 
   toast(mode === "seq" ? "已改成依進度" : "已改成依日期");
 });
 $("today").onclick = () => go(todayD);
-// ── 分頁：經文 → 恩典小品 → 今日禱告 ──
+// ── 分頁：經文 → 恩典小品 → 我們一起禱告 ──
 let page = 0;
 function showPage(n, dir){
   page = n;
@@ -6761,7 +6761,7 @@ function renderNav(){
   prev.disabled = page === 0;
   prev.textContent = page === 1 ? "‹ 首頁" : page === 2 ? "‹ 經文" : "‹ 恩典小品";
   home.disabled = false;
-  next.textContent = page === 1 ? "恩典小品 ›" : page === 2 ? "今日禱告 ›" : (mode === "seq" ? "下一章 ›" : "下一天 ›");
+  next.textContent = page === 1 ? "恩典小品 ›" : page === 2 ? "一起禱告 ›" : (mode === "seq" ? "下一章 ›" : "下一天 ›");
 }
 $("pnPrev").onclick = () => { if (page > 0) showPage(page - 1, -1); };
 $("pnNext").onclick = () => {
