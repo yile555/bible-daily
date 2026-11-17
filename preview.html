@@ -344,7 +344,6 @@ body.night .linebar{background:#3a3220;border-color:#6b5a2a;color:#f3e2b0}
       <p class="tipline">您的批評與鼓勵，都是「箴言書的讀經日常」成長的動力。</p>
       <p class="tipline fbnote">您的留言只提供改善工具使用，不會用在工具以外。</p>
       <textarea id="fbMsg" class="fbmsg" placeholder="例如：11 月 17 日的故事有錯字……"></textarea>
-      <input id="fbName" class="fbname" type="text" placeholder="你的稱呼（可以不填）">
       <input type="checkbox" id="fbBot" hidden tabindex="-1" autocomplete="off">
       <button class="save fbsend" id="fbSend" disabled>送出留言</button>
       <p class="fbstat" id="fbStat"></p>
@@ -7205,7 +7204,7 @@ connect().then(s => { store = s; loadNote(); loadJournal(); });
           access_key: "dbf30cc3-7bda-42e4-a484-a6d22df27986",
           subject: "箴言讀經日常：新的留言",
           from_name: "箴言讀經日常",
-          name: $("fbName").value.trim() || "（沒有留稱呼）",
+          name: "匿名",
           message: text,
           "當時看到的日期": d
         })
