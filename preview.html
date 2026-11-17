@@ -300,6 +300,10 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
 @keyframes lbPulse{0%,100%{box-shadow:0 0 0 0 rgba(45,107,96,.55);filter:brightness(1)}50%{box-shadow:0 0 0 8px rgba(45,107,96,0);filter:brightness(1.25)}}
 .linebar a{display:block;margin-top:10px;background:var(--accent);color:#fff;text-decoration:none;padding:12px;border-radius:12px;font-weight:700;font-size:calc(17px * var(--fs,1))}
 body.night .linebar{background:#3a3220;border-color:#6b5a2a;color:#f3e2b0}
+.fbmsg{display:block;width:100%;box-sizing:border-box;min-height:110px;margin:6px 0 10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-size:calc(16px * var(--fs,1));line-height:1.6;resize:vertical}
+.fbname{display:block;width:100%;box-sizing:border-box;margin:0 0 10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-size:calc(16px * var(--fs,1))}
+.fbsend{display:block;width:100%;margin-bottom:6px}
+.fbstat{margin:6px 0 12px;font-size:calc(15px * var(--fs,1));color:var(--accent);min-height:1em}
 </style>
 </head>
 <body>
@@ -333,6 +337,15 @@ body.night .linebar{background:#3a3220;border-color:#6b5a2a;color:#f3e2b0}
         <dt><span class="ic ok">✓</span></dt><dd>讀完自動打勾</dd>
       </dl>
       <p class="tipline">打開過一次之後，沒有網路也能讀。</p>
+    </details>
+    <details class="help" id="fbBox">
+      <summary>發現錯字、有建議？請留言</summary>
+      <p class="tipline">留言只會寄給製作這份讀經工具的人，其他人看不到。</p>
+      <textarea id="fbMsg" class="fbmsg" placeholder="例如：11 月 17 日的故事有錯字……"></textarea>
+      <input id="fbName" class="fbname" type="text" placeholder="你的稱呼（可以不填）">
+      <input type="checkbox" id="fbBot" hidden tabindex="-1" autocomplete="off">
+      <button class="save fbsend" id="fbSend" disabled>送出留言</button>
+      <p class="fbstat" id="fbStat"></p>
     </details>
   </section>
 
@@ -7172,6 +7185,34 @@ connect().then(s => { store = s; loadNote(); loadJournal(); });
   const u = new URL(location.href); u.searchParams.set("openExternalBrowser","1");
   $("lineOpen").href = u.toString();
   $("lineBar").hidden = false;
+})();
+
+// ── 留言回饋：用 Web3Forms 寄到製作者的信箱（存取碼本來就是公開用的，不是密碼）──
+(function(){
+  const msg = $("fbMsg"), send = $("fbSend"), stat = $("fbStat");
+  msg.addEventListener("input", () => { send.disabled = !msg.value.trim(); stat.textContent = ""; });
+  send.onclick = async () => {
+    if ($("fbBot").checked) return;
+    const text = msg.value.trim(); if (!text) return;
+    send.disabled = true; stat.textContent = "送出中……";
+    const d = (typeof mode !== "undefined" && mode === "seq") ? `依進度：箴言第 ${seq.ch} 章` : `${cur.getMonth()+1} 月 ${cur.getDate()} 日（箴言第 ${cur.getDate()} 章）`;
+    try {
+      const r = await fetch("https://api.web3forms.com/submit", {
+        method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          access_key: "dbf30cc3-7bda-42e4-a484-a6d22df27986",
+          subject: "箴言讀經日常：新的留言",
+          from_name: "箴言讀經日常",
+          name: $("fbName").value.trim() || "（沒有留稱呼）",
+          message: text,
+          "當時看到的日期": d
+        })
+      });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok && j.success !== false){ msg.value = ""; stat.textContent = "謝謝你！留言已經送出。"; }
+      else { stat.textContent = "沒有送出成功，請稍後再試一次。"; send.disabled = false; }
+    } catch(e){ stat.textContent = "現在好像沒有網路，請連上網路再送一次。"; send.disabled = false; }
+  };
 })();
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
   window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
