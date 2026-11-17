@@ -292,10 +292,16 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
 .vlist li.storyv .n{color:#fff;background:var(--gold);border-radius:4px;padding:0 3px;margin-left:-3px}
 .toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:var(--paper);font-size:calc(14px * var(--fs,1));padding:9px 16px;border-radius:999px;z-index:30;opacity:0;transition:opacity .25s;pointer-events:none}
 .toast.show{opacity:1}
+.linebar{display:flex;align-items:center;gap:10px;margin:0 0 14px;padding:10px 12px;border-radius:14px;background:#fff7e0;border:1px solid #e6c56a;color:#5a4400;font-size:calc(14px * var(--fs,1));line-height:1.5}
+.linebar[hidden]{display:none}
+.linebar span{flex:1}
+.linebar a{flex:none;background:var(--accent);color:#fff;text-decoration:none;padding:8px 12px;border-radius:999px;font-weight:600;white-space:nowrap}
+body.night .linebar{background:#3a3220;border-color:#6b5a2a;color:#f3e2b0}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="linebar" id="lineBar" hidden><span>在 LINE 裡打開，筆記會存在 LINE 裡，也無法備份。</span><a id="lineOpen" href="#">用瀏覽器開啟</a></div>
 
   <div class="greet" id="greet"></div>
   <div class="datebar" id="datebar">
@@ -7154,6 +7160,14 @@ applyFs();
 render();
 showPage(0, 0);
 connect().then(s => { store = s; loadNote(); loadJournal(); });
+
+// ── 在 LINE 內建瀏覽器打開時：提醒改用手機的瀏覽器（LINE 官方參數 openExternalBrowser=1）──
+(function(){
+  if (!/\bLine\//i.test(navigator.userAgent)) return;
+  const u = new URL(location.href); u.searchParams.set("openExternalBrowser","1");
+  $("lineOpen").href = u.toString();
+  $("lineBar").hidden = false;
+})();
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
   window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
 }
