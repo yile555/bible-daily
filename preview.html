@@ -6428,9 +6428,10 @@ const NOTES = {
 const MODES = {
   morning:   { greet:"早安", story:"今日恩典小品", open:"親愛的天父，", bless:"早安，願今天的你被祝福圍繞。" },
   afternoon: { greet:"午安", story:"今日恩典小品", open:"親愛的天父，", bless:"午安，停下來深呼吸，謝謝此刻擁有的一切。" },
+  evening:   { greet:"晚上好", story:"今晚恩典小品", open:"親愛的天父，", bless:"晚上好，忙了一天，願天父的平安陪你歇一歇。" },
   night:     { greet:"晚安", story:"今晚恩典小品", open:"親愛的天父，", bless:"晚安，願天父的愛陪你安穩入睡。" }
 };
-function currentMode(){ const h = new Date().getHours(); return h>=5&&h<11 ? "morning" : (h>=11&&h<18 ? "afternoon" : "night"); }
+function currentMode(){ const h = new Date().getHours(); return h>=5&&h<11 ? "morning" : h>=11&&h<18 ? "afternoon" : h>=18&&h<21 ? "evening" : "night"; }
 
 const WEEK = "日一二三四五六";
 const now = new Date();
@@ -6689,7 +6690,7 @@ function renderPlan(){
 let reflectBase = "";
 function applyMode(){
   const mode = currentMode(), md = MODES[mode];
-  document.body.classList.toggle("night", mode === "night");
+  document.body.classList.toggle("night", mode === "night" || mode === "evening");
   $("greet").textContent = md.greet;
   $("storyLabel").textContent = md.story;
   $("bless").textContent = md.bless;   // ★ 修正：時段換了，禱告下面的祝福語也一起換（原本要重新整理才會換）
