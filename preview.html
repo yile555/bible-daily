@@ -303,6 +303,7 @@ body.night .linebar{background:#3a3220;border-color:#6b5a2a;color:#f3e2b0}
 .fbmsg{display:block;width:100%;box-sizing:border-box;min-height:110px;margin:6px 0 10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-size:calc(16px * var(--fs,1));line-height:1.6;resize:vertical}
 .fbname{display:block;width:100%;box-sizing:border-box;margin:0 0 10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-size:calc(16px * var(--fs,1))}
 .fbsend{display:block;width:100%;margin-bottom:6px}
+.fbnote{font-size:calc(14px * var(--fs,1));color:var(--muted)}
 .fbstat{margin:6px 0 12px;font-size:calc(15px * var(--fs,1));color:var(--accent);min-height:1em}
 </style>
 </head>
@@ -339,8 +340,9 @@ body.night .linebar{background:#3a3220;border-color:#6b5a2a;color:#f3e2b0}
       <p class="tipline">打開過一次之後，沒有網路也能讀。</p>
     </details>
     <details class="help" id="fbBox">
-      <summary>發現錯字、有建議？請留言</summary>
-      <p class="tipline">留言只會寄給製作這份讀經工具的人，其他人看不到。</p>
+      <summary>有誤之處，歡迎指教與建議</summary>
+      <p class="tipline">您的批評與鼓勵，都是「箴言書的讀經日常」成長的動力。</p>
+      <p class="tipline fbnote">您的留言只提供改善工具使用，不會用在工具以外。</p>
       <textarea id="fbMsg" class="fbmsg" placeholder="例如：11 月 17 日的故事有錯字……"></textarea>
       <input id="fbName" class="fbname" type="text" placeholder="你的稱呼（可以不填）">
       <input type="checkbox" id="fbBot" hidden tabindex="-1" autocomplete="off">
