@@ -292,16 +292,15 @@ body.night .vform textarea{background:#27322f;color:var(--ink);border-color:#3a4
 .vlist li.storyv .n{color:#fff;background:var(--gold);border-radius:4px;padding:0 3px;margin-left:-3px}
 .toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:var(--paper);font-size:calc(14px * var(--fs,1));padding:9px 16px;border-radius:999px;z-index:30;opacity:0;transition:opacity .25s;pointer-events:none}
 .toast.show{opacity:1}
-.linebar{display:flex;align-items:center;gap:10px;margin:0 0 14px;padding:10px 12px;border-radius:14px;background:#fff7e0;border:1px solid #e6c56a;color:#5a4400;font-size:calc(14px * var(--fs,1));line-height:1.5}
+.linebar{display:block;margin:0 0 14px;padding:12px 14px;border-radius:14px;background:#fff7e0;border:1px solid #e6c56a;color:#5a4400;font-size:calc(15px * var(--fs,1));line-height:1.6;text-align:center}
 .linebar[hidden]{display:none}
-.linebar span{flex:1}
-.linebar a{flex:none;background:var(--accent);color:#fff;text-decoration:none;padding:8px 12px;border-radius:999px;font-weight:600;white-space:nowrap}
+.linebar a{display:block;margin-top:10px;background:var(--accent);color:#fff;text-decoration:none;padding:12px;border-radius:12px;font-weight:700;font-size:calc(17px * var(--fs,1))}
 body.night .linebar{background:#3a3220;border-color:#6b5a2a;color:#f3e2b0}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="linebar" id="lineBar" hidden><span>在 LINE 裡打開，筆記會存在 LINE 裡，也無法備份。</span><a id="lineOpen" href="#">用瀏覽器開啟</a></div>
+  <div class="linebar" id="lineBar" hidden><span>這裡可以照常讀經。<br>想把心得好好存下來，請按下面的按鈕：</span><a id="lineOpen" href="#">換到手機瀏覽器 ›</a></div>
 
   <div class="greet" id="greet"></div>
   <div class="datebar" id="datebar">
